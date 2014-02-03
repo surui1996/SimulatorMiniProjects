@@ -1,0 +1,3 @@
+C:\Users\דורון\Desktop\FirstPersonCamera\FirstPersonCamera\Content\obj\x86\Debug\RobotSimulatorContent.contentprojResolveAssemblyReference.cache
+C:\Users\דורון\Desktop\RobotSimulator\FirstPersonCamera\Content\obj\x86\Debug\RobotSimulatorContent.contentprojResolveAssemblyReference.cache
+C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\Content\obj\x86\Debug\RobotSimulatorContent.contentprojResolveAssemblyReference.cache

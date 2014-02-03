@@ -1,0 +1,13 @@
+c7fc1f3312634ef3a436a5ee1ada2623
+0
+v-eronh_xdk
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\
+128867230840000000
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\GameThumbnail.png
+2009-05-11T19:26:53.3705864Z
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\FirstPersonCamera.exe
+2009-05-13T21:17:40.4891441Z
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\Content\box.xnb
+2009-05-13T21:17:40.1111441Z
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\Content\boxtexture.xnb
+2009-05-13T21:17:40.3361441Z

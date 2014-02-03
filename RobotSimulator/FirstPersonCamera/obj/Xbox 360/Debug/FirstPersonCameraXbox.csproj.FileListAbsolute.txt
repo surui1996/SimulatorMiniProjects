@@ -1,0 +1,8 @@
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\Content\box.xnb
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\Content\boxtexture.xnb
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\FirstPersonCamera.exe
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\bin\Xbox 360\Debug\FirstPersonCamera.pdb
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\obj\Xbox 360\Debug\ResolveAssemblyReference.cache
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\obj\Xbox 360\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\obj\Xbox 360\Debug\FirstPersonCamera.exe
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\obj\Xbox 360\Debug\FirstPersonCamera.pdb

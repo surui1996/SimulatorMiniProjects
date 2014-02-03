@@ -1,0 +1,2 @@
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\Content\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\XNASrc\source\platform\private\ue\rsrc\samples\cs\MathSamples\FirstPersonCamera\FirstPersonCamera\Content\obj\Xbox 360\Debug\ResolveAssemblyReference.cache

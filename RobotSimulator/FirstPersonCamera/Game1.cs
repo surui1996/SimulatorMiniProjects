@@ -91,7 +91,7 @@ namespace RobotSimulator
                 new Vector3(Field.WIDTH / 2, Field.HEIGHT_ABOVE_CARPET / 2, -Field.HEIGHT),
                 Content.Load<Texture2D>("visionBlue"));
 
-            dynamicRightVision = new TexturedWall(Field.DYNAMIC_WIDTH, Field.DYNAMIC_HEIGHT, 0.01f,
+            dynamicRightVision = new TexturedWall(Field.DYNAMIC_WIDTH, Field.DYNAMIC_HEIGHT, 0.1f,
                 new Vector3(-Field.WIDTH / 2, -Field.HEIGHT_ABOVE_CARPET / 2, 0) +
                 new Vector3((Field.LOWGOAL_WIDTH +Field.LOWGOAL_WIDTH)/2,Field.DYNAMIC_HEIGHT_ABOVE_CARPET + Field.DYNAMIC_HEIGHT,0),
                 Content.Load<Texture2D>("visionTarget"));

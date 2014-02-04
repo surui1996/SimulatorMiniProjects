@@ -1,0 +1,3 @@
+C:\Users\דורון\Documents\Visual Studio 2010\Projects\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectoryContent\obj\x86\Debug\ParabolicTrajectoryContent.contentprojResolveAssemblyReference.cache
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectoryContent\obj\x86\Debug\ParabolicTrajectoryContent.contentprojResolveAssemblyReference.cache
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectoryContent\obj\x86\Debug\ParabolicTrajectoryContent.contentprojResolveAssemblyReference.cache

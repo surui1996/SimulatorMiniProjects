@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
+  <Asset Type="Pipeline:BuildItemCollection">
+    <Item>
+      <Source>font.spritefont</Source>
+      <Name>font</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\font.xnb</Output>
+      <Time>2014-02-04T08:12:36.244056+02:00</Time>
+    </Item>
+    <Item>
+      <Source>transparent ball.jpg</Source>
+      <Name>transparent ball</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\transparent ball.xnb</Output>
+      <Time>2014-02-04T08:31:31.3560927+02:00</Time>
+    </Item>
+    <Item>
+      <Source>transparent arrow.jpg</Source>
+      <Name>transparent arrow</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\transparent arrow.xnb</Output>
+      <Time>2014-02-04T09:25:38.102452+02:00</Time>
+    </Item>
+    <Item>
+      <Source>ground.jpg</Source>
+      <Name>ground</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\ground.xnb</Output>
+      <Time>2014-02-04T11:48:09.0105825+02:00</Time>
+    </Item>
+    <BuildSuccessful>true</BuildSuccessful>
+    <Settings>
+      <TargetPlatform>Windows</TargetPlatform>
+      <TargetProfile>HiDef</TargetProfile>
+      <BuildConfiguration>Debug</BuildConfiguration>
+      <CompressContent>false</CompressContent>
+      <RootDirectory>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectoryContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectoryContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\</OutputDirectory>
+    </Settings>
+    <Assemblies>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>
+        <Value>2010-08-23T13:41:18+03:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.VideoImporters.dll</Key>
+        <Value>2010-08-23T13:41:18+03:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.TextureImporter.dll</Key>
+        <Value>2010-08-23T13:41:18+03:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.FBXImporter.dll</Key>
+        <Value>2010-08-23T13:41:18+03:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.EffectImporter.dll</Key>
+        <Value>2010-08-23T13:41:18+03:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.AudioImporters.dll</Key>
+        <Value>2010-08-23T13:41:18+03:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\windows\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2014-01-06T15:56:51.1720129+02:00</Value>
+      </Assembly>
+    </Assemblies>
+  </Asset>
+</XnaContent>

@@ -1,0 +1,26 @@
+C:\Users\דורון\Documents\Visual Studio 2010\Projects\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.csprojResolveAssemblyReference.cache
+C:\Users\דורון\Documents\Visual Studio 2010\Projects\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\דורון\Documents\Visual Studio 2010\Projects\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\ParabolicTrajectory.exe
+C:\Users\דורון\Documents\Visual Studio 2010\Projects\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\ParabolicTrajectory.pdb
+C:\Users\דורון\Documents\Visual Studio 2010\Projects\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.exe
+C:\Users\דורון\Documents\Visual Studio 2010\Projects\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.pdb
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.csprojResolveAssemblyReference.cache
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.exe
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\ParabolicTrajectory.exe
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\ParabolicTrajectory.pdb
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.pdb
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\font.xnb
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\transparent ball.xnb
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\transparent arrow.xnb
+C:\Users\דורון\Documents\GitHub\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\ground.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\font.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\transparent ball.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\transparent arrow.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\Content\ground.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\ParabolicTrajectory.exe
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\bin\x86\Debug\ParabolicTrajectory.pdb
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.csprojResolveAssemblyReference.cache
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.exe
+C:\Users\דורון\Documents\GitHub\Simulator\ParabolicTrajectory\ParabolicTrajectory\ParabolicTrajectory\obj\x86\Debug\ParabolicTrajectory.pdb

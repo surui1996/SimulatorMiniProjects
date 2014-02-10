@@ -27,7 +27,7 @@ namespace ParabolicTrajectory
 
         #region Constants
         const int BALL_DIAMETER = 51, GROUND_LEN = 225;
-        const float X_POS = 50f, Y_POS = 400f, DEFAULT_VELOCITY = 50f, DEFAULT_ANGLE = 45f, DT = 0.005f, SCALE = 0.1f;
+        const float X_POS = 50f, Y_POS = 400f, DEFAULT_VELOCITY = 10f, DEFAULT_ANGLE = 45f, DT = 0.005f, SCALE = 0.1f;
         Color DEFAULT_COLOR = Color.CornflowerBlue;
         #endregion
 
@@ -40,7 +40,7 @@ namespace ParabolicTrajectory
 
         #region Game Objects
         Graph graph;
-        Ball ball;
+        Ball ball, ball2, dragBall;
         #endregion
 
         public TrajectoryGame()
@@ -77,6 +77,10 @@ namespace ParabolicTrajectory
 
             ball = new Ball(new Vector2(X_POS, Y_POS), DEFAULT_VELOCITY, DEFAULT_ANGLE, ball2D);
             ball.CalculateTrajectoryWithNoDrag();
+            ball2 = new Ball(new Vector2(X_POS, Y_POS), DEFAULT_VELOCITY, DEFAULT_ANGLE, ball2D);
+            ball2.CalculateTrajectoryWithNoDrag2();
+            dragBall = new Ball(new Vector2(X_POS, Y_POS), DEFAULT_VELOCITY, DEFAULT_ANGLE, ball2D);
+            dragBall.CalculateTrajectoryWithDrag();
         }
 
         /// <summary>
@@ -112,6 +116,14 @@ namespace ParabolicTrajectory
                 ball.InitialAngle = angle;
                 ball.InitialVelocityMagnitude = velocity;
                 ball.CalculateTrajectoryWithNoDrag();
+                
+                ball2.InitialAngle = angle;
+                ball2.InitialVelocityMagnitude = velocity;
+                ball2.CalculateTrajectoryWithNoDrag2();
+
+                dragBall.InitialAngle = angle;
+                dragBall.InitialVelocityMagnitude = velocity;
+                dragBall.CalculateTrajectoryWithDrag();
             }
             else if (!state.IsKeyDown(Keys.Space) && spaceClicked)
                 spaceClicked = false;
@@ -134,6 +146,8 @@ namespace ParabolicTrajectory
             spriteBatch.End();
 
             graph.Draw(ball.Get3DPositions(), Color.Black);
+            graph.Draw(ball2.Get3DPositions(), Color.Red);
+            graph.Draw(dragBall.Get3DPositions(), Color.Green);
 
             base.Draw(gameTime);
         }
@@ -158,12 +172,15 @@ namespace ParabolicTrajectory
             if (!finishedShot)
             {
                 positionIndex = (int)(timeFromShot / DT);
-                finishedShot = ball.DrawBall(positionIndex, spriteBatch);
+                finishedShot = ball.DrawBall(positionIndex, spriteBatch) || ball2.DrawBall(positionIndex, spriteBatch)
+                    || dragBall.DrawBall(positionIndex, spriteBatch);
+                
 
                 timeFromShot += ellapsedSeconds;
             }
             else
-                finishedShot = ball.DrawBall(positionIndex, spriteBatch);
+                finishedShot = ball.DrawBall(positionIndex, spriteBatch) || ball2.DrawBall(positionIndex, spriteBatch)
+                    || dragBall.DrawBall(positionIndex, spriteBatch);
         }
 
         /// <summary>

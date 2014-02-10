@@ -9,45 +9,17 @@ namespace ParabolicTrajectory
 {
     public class Graph
     {
-
-        /// <summary>
-        /// The bottom left position of the graph
-        /// </summary>
-        public Vector2 Position { get; set; }
-
-        /// <summary>
-        /// The size of the graph.
-        /// The graph values will be scaled horizontally to fill width (Size.X)
-        /// Vertically, the values will be scaled based on MaxValue property, where the position of the value that is equal to MaxValue will be Size.Y
-        /// </summary>
-        public Point Size { get; set; }
-
-        /// <summary>
-        /// Determines the vertical scaling of the graph.
-        /// The value that is equal to MaxValue will be displayed at the top of the graph (at point Size.Y)
-        /// </summary>
-        public float MaxValue { get; set; }
-
-        private Vector2 _scale = new Vector2(1.0f, 1.0f);
-
-        BasicEffect _effect;
+        BasicEffect basicEffect;
         short[] lineListIndices;
 
         public Graph(GraphicsDevice graphicsDevice)
         {
-            _effect = new BasicEffect(graphicsDevice);
-            _effect.View = Matrix.CreateLookAt(Vector3.Backward, Vector3.Zero, Vector3.Up);
-            _effect.Projection = Matrix.CreateOrthographicOffCenter(0, (float)graphicsDevice.Viewport.Width, (float)graphicsDevice.Viewport.Height, 0, 1.0f, 1000.0f);
-            _effect.World = Matrix.Identity;
+            basicEffect = new BasicEffect(graphicsDevice);
+            basicEffect.View = Matrix.CreateLookAt(Vector3.Backward, Vector3.Zero, Vector3.Up);
+            basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, (float)graphicsDevice.Viewport.Width, (float)graphicsDevice.Viewport.Height, 0, 1.0f, 1000.0f);
+            basicEffect.World = Matrix.Identity;
 
-            _effect.VertexColorEnabled = true;
-        }
-
-        void UpdateWorld()
-        {
-            _effect.World = Matrix.CreateScale(_scale.X, _scale.Y, 1.0f)
-                          * Matrix.CreateRotationX(MathHelper.Pi) //flips the graph so that the higher values are above. Makes bottom left the graph origin.
-                          * Matrix.CreateTranslation(new Vector3(this.Position, 0));
+            basicEffect.VertexColorEnabled = true;
         }
 
         /// <summary>
@@ -57,14 +29,8 @@ namespace ParabolicTrajectory
         /// <param name="color">Color of the entire graph</param>
         public void Draw(List<Vector3> values, Color color)
         {
-            if (values.Count < 2)
+            if (values.Count <= 2)
                 return;
-
-            //float xScale = this.Size.X / (float)values.Count;
-            //float yScale = this.Size.Y / MaxValue;
-
-            //_scale = new Vector2(xScale, yScale);
-            //UpdateWorld();
 
             VertexPositionColor[] pointList = new VertexPositionColor[values.Count];
             for (int i = 0; i < values.Count; i++)
@@ -72,6 +38,20 @@ namespace ParabolicTrajectory
 
             DrawLineList(pointList);
 
+        }
+        /// <summary>
+        /// Draws a line, in specified color
+        /// </summary>
+        /// <param name="p1">the first point of the line</param>
+        /// <param name="p2">the second point of the line</param>
+        /// <param name="color">Color of the line</param>
+        public void DrawLine(Vector2 p1, Vector2 p2, Color color)
+        {
+            VertexPositionColor[] pointList = new VertexPositionColor[2];
+            pointList[0] = new VertexPositionColor(new Vector3(p1, 0), color);
+            pointList[1] = new VertexPositionColor(new Vector3(p2, 0), color);
+
+            DrawLineList(pointList);
         }
 
         void DrawLineList(VertexPositionColor[] pointList)
@@ -89,10 +69,10 @@ namespace ParabolicTrajectory
                 }
             }
 
-            foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                _effect.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(
+                basicEffect.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(
                     PrimitiveType.LineList,
                     pointList,
                     0,

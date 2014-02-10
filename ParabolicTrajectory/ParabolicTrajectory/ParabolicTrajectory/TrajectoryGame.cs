@@ -100,13 +100,13 @@ namespace ParabolicTrajectory
             if (state.IsKeyDown(Keys.Escape)) // Allows the game to exit
                 this.Exit();
             else if (state.IsKeyDown(Keys.W))
-                angle += 0.05f;
-            else if (state.IsKeyDown(Keys.S))
-                angle -= 0.05f;
-            else if (state.IsKeyDown(Keys.D))
                 velocity += 0.5f;
-            else if (state.IsKeyDown(Keys.A))
+            else if (state.IsKeyDown(Keys.S))
                 velocity -= 0.5f;
+            else if (state.IsKeyDown(Keys.D))
+                angle -= 0.05f;
+            else if (state.IsKeyDown(Keys.A))
+                angle += 0.05f;
 
             if (state.IsKeyDown(Keys.Space) && !spaceClicked)
             {
@@ -116,7 +116,7 @@ namespace ParabolicTrajectory
                 ball.InitialAngle = angle;
                 ball.InitialVelocityMagnitude = velocity;
                 ball.CalculateTrajectoryWithNoDrag();
-                
+
                 ball2.InitialAngle = angle;
                 ball2.InitialVelocityMagnitude = velocity;
                 ball2.CalculateTrajectoryWithNoDrag2();
@@ -148,7 +148,11 @@ namespace ParabolicTrajectory
             graph.Draw(ball.Get3DPositions(), Color.Black);
             graph.Draw(ball2.Get3DPositions(), Color.Red);
             graph.Draw(dragBall.Get3DPositions(), Color.Green);
+            graph.DrawLine(ball.MaximumPoint, new Vector2(ball.MaximumPoint.X, Y_POS), Color.Black);
+            graph.DrawLine(ball2.MaximumPoint, new Vector2(ball2.MaximumPoint.X, Y_POS), Color.Red);
+            graph.DrawLine(dragBall.MaximumPoint, new Vector2(dragBall.MaximumPoint.X, Y_POS), Color.Green);
 
+            graph.Draw(Ball.GetSimpleTrajectory(ball.MaximumPoint.Y, dragBall.InitialAngle, new Vector2(X_POS, Y_POS)), Color.GreenYellow);
             base.Draw(gameTime);
         }
 
@@ -174,7 +178,7 @@ namespace ParabolicTrajectory
                 positionIndex = (int)(timeFromShot / DT);
                 finishedShot = ball.DrawBall(positionIndex, spriteBatch) || ball2.DrawBall(positionIndex, spriteBatch)
                     || dragBall.DrawBall(positionIndex, spriteBatch);
-                
+
 
                 timeFromShot += ellapsedSeconds;
             }

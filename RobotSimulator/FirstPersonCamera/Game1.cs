@@ -39,7 +39,7 @@ namespace RobotSimulator
 
         // Set rates in world units per 1/60th second (the default fixed-step interval).
         float rotationSpeed = 1f / (10f * Field.C);
-        float forwardSpeed = 50f / (6f * Field.C);
+        float forwardSpeed = 50f / (3f * Field.C);
 
         // Set field of view of the camera in radians (pi/4 is 45 degrees).
         static float viewAngle = MathHelper.ToRadians(45f);

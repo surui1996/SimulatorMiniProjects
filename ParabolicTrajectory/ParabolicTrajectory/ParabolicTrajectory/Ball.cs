@@ -14,7 +14,8 @@ namespace ParabolicTrajectory
         private float initialVelocityMagnitude, initialAngle;
         private Vector2 initialPosition;
         private List<Vector2> positions;
-        Texture2D ball2D;
+        private Vector2 maximumPoint;
+        private Texture2D ball2D;
         #endregion
         
         #region Constants and Formula Constants
@@ -32,6 +33,7 @@ namespace ParabolicTrajectory
         public float InitialVelocityMagnitude { get { return initialVelocityMagnitude; } set { initialVelocityMagnitude = value; } }
         public float InitialAngle { get { return initialAngle; } set { initialAngle = value; } }
         public List<Vector2> Positions { get { return positions; } set { positions = value; } }
+        public Vector2 MaximumPoint { get { return maximumPoint; } set { maximumPoint = value; } }
         #endregion
         
         public Ball(Vector2 position, float velocity, float angle, Texture2D texture)
@@ -55,6 +57,19 @@ namespace ParabolicTrajectory
             this.ball2D = texture;
         }
 
+        private static List<Vector2> CalculateTrajectoryWithNoDrag(float vx, float vy, Vector2 initialPosition)
+        {
+            List<Vector2> myPositions = new List<Vector2>();
+            Vector2 pos = Vector2.Zero;
+            for (float t = 0; t < 100.0f; t += DT)
+            {
+                //x = vx* t, y = vy*t - 0.5*g*t^2
+                pos = initialPosition + new Vector2(vx * t, -vy * t + 0.5f * kG * t * t) * BIGGER;
+                myPositions.Add(pos);
+            }
+            return myPositions;
+        }
+
         public void CalculateTrajectoryWithNoDrag()
         {
             positions = new List<Vector2>();
@@ -62,15 +77,17 @@ namespace ParabolicTrajectory
             for (float t = 0; t < 100.0f; t += DT)
             {
                 //x = vx* t, y = vy*t - 0.5*g*t^2
-                pos = initialPosition + new Vector2(GetVX() * t, -GetVY() * t + 0.5f * kG * t * t) * BIGGER;
+                pos = initialPosition + new Vector2(GetVX(initialVelocityMagnitude, InitialAngle) * t,
+                    -GetVY(initialVelocityMagnitude, InitialAngle) * t + 0.5f * kG * t * t) * BIGGER;
                 this.positions.Add(pos);
             }
+            CalculateMaximumPoint();
         }
 
         public void CalculateTrajectoryWithNoDrag2()
         {
             positions = new List<Vector2>();
-            Vector2 currentVelocity = new Vector2(GetVX(), -GetVY());
+            Vector2 currentVelocity = new Vector2(GetVX(initialVelocityMagnitude, InitialAngle), -GetVY(initialVelocityMagnitude, InitialAngle));
             Vector2 currentPosition = initialPosition;
             for (float t = 0; t < 100.0f; t += DT)
             {
@@ -79,6 +96,7 @@ namespace ParabolicTrajectory
                 currentPosition += currentVelocity * DT * BIGGER; //we assume speed is constant over t=DT seconds
                 this.positions.Add(currentPosition);
             }
+            CalculateMaximumPoint();
         }
 
         public void CalculateTrajectoryWithDrag()
@@ -86,7 +104,7 @@ namespace ParabolicTrajectory
             positions = new List<Vector2>();
             float dragForceMagnitude = 0.0f;
             Vector2 dragAcceleration = Vector2.Zero;
-            Vector2 currentVelocity = new Vector2(GetVX(), -GetVY());
+            Vector2 currentVelocity = new Vector2(GetVX(initialVelocityMagnitude, InitialAngle), -GetVY(initialVelocityMagnitude, InitialAngle));
 
             Vector2 currentPosition = initialPosition;
             for (float t = 0; t < 100.0f; t += DT)
@@ -101,8 +119,19 @@ namespace ParabolicTrajectory
                 currentPosition += currentVelocity * DT * BIGGER;
                 this.positions.Add(currentPosition);
             }
+            CalculateMaximumPoint();
         }
 
+        private void CalculateMaximumPoint()
+        {
+            Vector2 maxPoint = positions[0];
+            for (int i = 1; i < positions.Count; i++)
+            {
+                if (positions[i].Y < maxPoint.Y) // y axis is opposite
+                    maxPoint = positions[i];
+            }
+            maximumPoint = maxPoint;
+        }
 
         private Vector2 NormalizeVector(Vector2 v)
         {
@@ -127,22 +156,40 @@ namespace ParabolicTrajectory
             return positionIndex > 10 && Math.Abs(positions[positionIndex].Y - initialPosition.Y) < 1f;
         }
 
-        private float GetVX()
+        private static float GetVX(float velocity, float angle)
         {
-            return initialVelocityMagnitude * (float)Math.Cos(MathHelper.ToRadians(initialAngle));
+            return velocity * (float)Math.Cos(MathHelper.ToRadians(angle));
         }
 
-        private float GetVY()
+        private static float GetVY(float velocity, float angle)
         {
-            return initialVelocityMagnitude * (float)Math.Sin(MathHelper.ToRadians(initialAngle));
+            return velocity * (float)Math.Sin(MathHelper.ToRadians(angle));
+        }
+
+        public static List<Vector3> GetSimpleTrajectory(float maximumHeight, float initialAngle, Vector2 initialPosition)
+        {
+            //Hmax = v^2 * sin(2a) / (2g)
+            //v = (2 * g * Hmax / sin(2a))^0.5
+            float doubleSine = (float)Math.Sin(MathHelper.ToRadians(initialAngle * 2f));
+            float velocity = (float)Math.Sqrt((double)((2.0f * kG * maximumHeight) / (BIGGER * doubleSine)));
+
+            velocity = 8f;
+
+            return To3D(CalculateTrajectoryWithNoDrag(GetVX(velocity, initialAngle), GetVY(velocity, initialAngle), initialPosition));
         }
 
         public List<Vector3> Get3DPositions()
         {
+            return To3D(positions);
+        }
+
+        private static List<Vector3> To3D(List<Vector2> vectorList)
+        {
             List<Vector3> position3 = new List<Vector3>();
-            foreach (Vector2 v in positions)
+            foreach (Vector2 v in vectorList)
                 position3.Add(new Vector3(v, 0f));
             return position3;
         }
     }
 }
+

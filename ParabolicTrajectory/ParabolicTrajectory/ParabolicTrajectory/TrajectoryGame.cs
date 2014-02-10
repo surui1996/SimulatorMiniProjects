@@ -14,29 +14,38 @@ namespace ParabolicTrajectory
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class TrajectoryGame : Microsoft.Xna.Framework.Game
     {
+        #region Graphics Variabels
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SpriteFont font;
         Texture2D ball2D;
-        const int BALL_DIAMETER = 51;
         Texture2D arrow2D;
         Texture2D ground2D;
-        const int GROUND_LEN = 225;
+        #endregion
 
-        Graph graph;
-        float velocity, angle;
-        const float kG = 9.8f, X_POS = 50f, Y_POS = 200f, DEFAULT_VELOCITY = 50f, DT = 0.005f, SCALE = 0.1f;
+        #region Constants
+        const int BALL_DIAMETER = 51, GROUND_LEN = 225;
+        const float X_POS = 50f, Y_POS = 400f, DEFAULT_VELOCITY = 50f, DEFAULT_ANGLE = 45f, DT = 0.005f, SCALE = 0.1f;
         Color DEFAULT_COLOR = Color.CornflowerBlue;
+        #endregion
+
+        #region Updating Variables
+        float velocity = DEFAULT_VELOCITY, angle = DEFAULT_ANGLE;
         bool spaceClicked = false, finishedShot = false;
         float timeFromShot;
         int positionIndex;
-        Vector2 origin;
-        List<Vector3> positions;
-        public Game1()
+        #endregion
+
+        #region Game Objects
+        Graph graph;
+        Ball ball;
+        #endregion
+
+        public TrajectoryGame()
         {
-            
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -50,16 +59,6 @@ namespace ParabolicTrajectory
         protected override void Initialize()
         {
             graph = new Graph(GraphicsDevice);
-            positions = new List<Vector3>();
-            velocity = DEFAULT_VELOCITY;
-            angle = 45.0f;
-            spaceClicked = false;
-            origin = new Vector2(X_POS, Y_POS);
-
-
-            CalcTrajectory(velocity, angle);
-            
-
             base.Initialize();
         }
 
@@ -75,34 +74,16 @@ namespace ParabolicTrajectory
             ball2D = Content.Load<Texture2D>("transparent ball");
             arrow2D = Content.Load<Texture2D>("transparent arrow");
             ground2D = Content.Load<Texture2D>("ground");
-        }
 
-        private void CalcTrajectory(float velocity, float angle)
-        {
-            float angleRad = MathHelper.ToRadians(angle);
-            
-            float vx = velocity * (float)Math.Cos(angleRad);
-            float vy =  velocity * (float)Math.Sin(angleRad);
-            Vector3 pos = Vector3.Zero;
-            
-            for (float t = 0; t < 100.0f; t += DT)
-            {
-                pos = new Vector3(origin, 0) + new Vector3(vx * t, -vy * t + kG * t * t, 0);
-                positions.Add(pos);
-                //if (HasBallReachedGround((int)(t / DT)))
-                //    break;
-            }
-            
+            ball = new Ball(new Vector2(X_POS, Y_POS), DEFAULT_VELOCITY, DEFAULT_ANGLE, ball2D);
+            ball.CalculateTrajectoryWithNoDrag();
         }
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
         /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
+        protected override void UnloadContent() { }
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -112,9 +93,7 @@ namespace ParabolicTrajectory
         protected override void Update(GameTime gameTime)
         {
             KeyboardState state = Keyboard.GetState();
-
-            // Allows the game to exit
-            if (state.IsKeyDown(Keys.Escape))
+            if (state.IsKeyDown(Keys.Escape)) // Allows the game to exit
                 this.Exit();
             else if (state.IsKeyDown(Keys.W))
                 angle += 0.05f;
@@ -127,11 +106,12 @@ namespace ParabolicTrajectory
 
             if (state.IsKeyDown(Keys.Space) && !spaceClicked)
             {
-                positions = new List<Vector3>();
-                CalcTrajectory(velocity, angle);
                 spaceClicked = true;
-                finishedShot = false;
                 timeFromShot = 0;
+
+                ball.InitialAngle = angle;
+                ball.InitialVelocityMagnitude = velocity;
+                ball.CalculateTrajectoryWithNoDrag();
             }
             else if (!state.IsKeyDown(Keys.Space) && spaceClicked)
                 spaceClicked = false;
@@ -148,42 +128,47 @@ namespace ParabolicTrajectory
             GraphicsDevice.Clear(DEFAULT_COLOR);
 
             spriteBatch.Begin();
-
             DrawShootingParameters();
             DrawMovingBall(gameTime.ElapsedGameTime.Milliseconds / 1000f);
             DrawGround();
-
             spriteBatch.End();
 
-            graph.Draw(positions, Color.Black);
+            graph.Draw(ball.Get3DPositions(), Color.Black);
+
             base.Draw(gameTime);
         }
 
+        /// <summary>
+        /// Draws Into the screen the velocity and angle udating variables
+        /// </summary>
         private void DrawShootingParameters()
         {
             spriteBatch.DrawString(font, "velocity: " + Math.Round(velocity).ToString() + "m/s", new Vector2(600, 30), Color.Red);
             spriteBatch.DrawString(font, "angle: " + angle.ToString(), new Vector2(600, 60), Color.Red);
-            spriteBatch.Draw(arrow2D, origin, null, Color.CornflowerBlue, -MathHelper.ToRadians(angle),
+            spriteBatch.Draw(arrow2D, new Vector2(X_POS, Y_POS), null, Color.CornflowerBlue, -MathHelper.ToRadians(angle),
                 new Vector2(0f, 55f), new Vector2(SCALE * 0.8f * velocity / DEFAULT_VELOCITY, SCALE), SpriteEffects.None, 0);
         }
 
+        /// <summary>
+        /// Draws Into the screen the moving ball according to the time
+        /// <param name="ellapsedSeconds"> seconds elapsed since space was clicked </param>
+        /// </summary>
         private void DrawMovingBall(float ellapsedSeconds)
         {
             if (!finishedShot)
             {
                 positionIndex = (int)(timeFromShot / DT);
-                spriteBatch.Draw(ball2D, new Vector2(positions[positionIndex].X, positions[positionIndex].Y), null, DEFAULT_COLOR, 0f,
-                    new Vector2(51f, 51f), SCALE, SpriteEffects.None, 0);
-                if (HasBallReachedGround(positionIndex))
-                    finishedShot = true;
+                finishedShot = ball.DrawBall(positionIndex, spriteBatch);
 
                 timeFromShot += ellapsedSeconds;
             }
             else
-                spriteBatch.Draw(ball2D, new Vector2(positions[positionIndex].X, positions[positionIndex].Y), null, DEFAULT_COLOR, 0f,
-                    new Vector2(BALL_DIAMETER, BALL_DIAMETER), SCALE, SpriteEffects.None, 0);
+                finishedShot = ball.DrawBall(positionIndex, spriteBatch);
         }
 
+        /// <summary>
+        /// Draws horizontal ground with the ground2D texture
+        /// </summary>
         private void DrawGround()
         {
             float len = ((float)GROUND_LEN * SCALE);
@@ -191,11 +176,5 @@ namespace ParabolicTrajectory
                 spriteBatch.Draw(ground2D, new Vector2(i * len, Y_POS), null, Color.White, 0f, new Vector2(0, 0),
                     SCALE, SpriteEffects.None, 0);
         }
-
-        private bool HasBallReachedGround(int positionIndex)
-        {
-            return positionIndex > 10 && Math.Abs(positions[positionIndex].Y - Y_POS) < 1f;
-        }
-
     }
 }

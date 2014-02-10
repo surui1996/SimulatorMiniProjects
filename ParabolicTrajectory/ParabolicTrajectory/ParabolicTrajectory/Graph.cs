@@ -14,6 +14,7 @@ namespace ParabolicTrajectory
         /// The bottom left position of the graph
         /// </summary>
         public Vector2 Position { get; set; }
+
         /// <summary>
         /// The size of the graph.
         /// The graph values will be scaled horizontally to fill width (Size.X)
@@ -41,23 +42,6 @@ namespace ParabolicTrajectory
 
             _effect.VertexColorEnabled = true;
         }
-
-        //public Graph(GraphicsDevice graphicsDevice, Point size)
-        //{
-        //    _effect = new BasicEffect(graphicsDevice);
-        //    _effect.View = Matrix.CreateLookAt(Vector3.Backward, Vector3.Zero, Vector3.Up);
-        //    _effect.Projection = Matrix.CreateOrthographicOffCenter(0, (float)graphicsDevice.Viewport.Width, (float)graphicsDevice.Viewport.Height, 0, 1.0f, 1000.0f);
-        //    _effect.World = Matrix.Identity;
-
-        //    _effect.VertexColorEnabled = true;
-
-        //    this.MaxValue = 1;
-        //    this.Size = size;
-        //    if (size.Y <= 0)
-        //        Size = new Point(size.X, 1);
-        //    if (size.X <= 0)
-        //        Size = new Point(1, size.Y);
-        //}
 
         void UpdateWorld()
         {

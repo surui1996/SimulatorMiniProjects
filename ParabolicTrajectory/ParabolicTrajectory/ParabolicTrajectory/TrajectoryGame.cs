@@ -41,6 +41,7 @@ namespace ParabolicTrajectory
         #region Game Objects
         Graph graph;
         Ball ball, ball2, dragBall;
+        List<Vector3> simpleTrajectory; bool trajectoryIsNull = true;
         #endregion
 
         public TrajectoryGame()
@@ -107,6 +108,13 @@ namespace ParabolicTrajectory
                 angle -= 0.05f;
             else if (state.IsKeyDown(Keys.A))
                 angle += 0.05f;
+            else if (state.IsKeyDown(Keys.Enter))
+            {
+                //Trajectory 2 seems to be more of what i wanted...
+                simpleTrajectory = Ball.GetSimpleTrajectory2(dragBall.MaximumPoint, dragBall.InitialVelocityMagnitude,
+                    dragBall.InitialAngle, new Vector2(X_POS, Y_POS));
+                trajectoryIsNull = false;
+            }
 
             if (state.IsKeyDown(Keys.Space) && !spaceClicked)
             {
@@ -151,8 +159,13 @@ namespace ParabolicTrajectory
             graph.DrawLine(ball.MaximumPoint, new Vector2(ball.MaximumPoint.X, Y_POS), Color.Black);
             graph.DrawLine(ball2.MaximumPoint, new Vector2(ball2.MaximumPoint.X, Y_POS), Color.Red);
             graph.DrawLine(dragBall.MaximumPoint, new Vector2(dragBall.MaximumPoint.X, Y_POS), Color.Green);
+            if (!trajectoryIsNull)
+            {
+                graph.Draw(simpleTrajectory, Color.GreenYellow);
+                Vector2 p = Ball.CalculateMaximumPoint(Ball.To2D(simpleTrajectory));
+                graph.DrawLine(p, new Vector2(p.X, Y_POS), Color.GreenYellow);
+            }
 
-            graph.Draw(Ball.GetSimpleTrajectory(ball.MaximumPoint.Y, dragBall.InitialAngle, new Vector2(X_POS, Y_POS)), Color.GreenYellow);
             base.Draw(gameTime);
         }
 

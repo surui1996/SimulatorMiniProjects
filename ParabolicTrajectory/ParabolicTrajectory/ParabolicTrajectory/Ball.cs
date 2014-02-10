@@ -133,6 +133,17 @@ namespace ParabolicTrajectory
             maximumPoint = maxPoint;
         }
 
+        public static Vector2 CalculateMaximumPoint(List<Vector2> positions)
+        {
+            Vector2 maxPoint = positions[0];
+            for (int i = 1; i < positions.Count; i++)
+            {
+                if (positions[i].Y < maxPoint.Y) // y axis is opposite
+                    maxPoint = positions[i];
+            }
+            return maxPoint;
+        }
+
         private Vector2 NormalizeVector(Vector2 v)
         {
             Vector2 ret = new Vector2(v.X, v.Y);
@@ -166,16 +177,54 @@ namespace ParabolicTrajectory
             return velocity * (float)Math.Sin(MathHelper.ToRadians(angle));
         }
 
-        public static List<Vector3> GetSimpleTrajectory(float maximumHeight, float initialAngle, Vector2 initialPosition)
+        public static List<Vector3> GetSimpleTrajectory(Vector2 maximumPoint, float maximumVelocityMagnitude, float initialAngle, Vector2 initialPosition)
         {
-            //Hmax = v^2 * sin(2a) / (2g)
-            //v = (2 * g * Hmax / sin(2a))^0.5
-            float doubleSine = (float)Math.Sin(MathHelper.ToRadians(initialAngle * 2f));
-            float velocity = (float)Math.Sqrt((double)((2.0f * kG * maximumHeight) / (BIGGER * doubleSine)));
+            float minimalDistance = Math.Max(maximumPoint.X, maximumPoint.Y);
+            float currentDistance;
+            List<Vector2> currentPositions, bestPositions = new List<Vector2>();
+            Vector2 currentPos;
 
-            velocity = 8f;
+            for (float v = maximumVelocityMagnitude; v > 0.2f; v -= 0.1f)
+            {
+                currentPositions = new List<Vector2>(CalculateTrajectoryWithNoDrag(GetVX(v, initialAngle), GetVY(v, initialAngle), initialPosition));
+                currentPos = CalculateMaximumPoint(currentPositions);
+                currentDistance = Distance(currentPos, maximumPoint);
+                if (currentDistance < minimalDistance)
+                {
+                    minimalDistance = currentDistance;
+                    bestPositions = currentPositions;
+                }
+                
+            }
+            return To3D(bestPositions);            
+        }
+        //only with Y
+        public static List<Vector3> GetSimpleTrajectory2(Vector2 maximumPoint, float maximumVelocityMagnitude, float initialAngle, Vector2 initialPosition)
+        {
+            float minimalDistance = maximumPoint.Y;
+            float currentDistance;
+            List<Vector2> currentPositions, bestPositions = new List<Vector2>();
+            float currentMax;
 
-            return To3D(CalculateTrajectoryWithNoDrag(GetVX(velocity, initialAngle), GetVY(velocity, initialAngle), initialPosition));
+            for (float v = maximumVelocityMagnitude; v > 0.2f; v -= 0.1f)
+            {
+                currentPositions = new List<Vector2>(CalculateTrajectoryWithNoDrag(GetVX(v, initialAngle),
+                    GetVY(v, initialAngle), initialPosition));
+                currentMax = CalculateMaximumPoint(currentPositions).Y;
+                currentDistance = Math.Abs(currentMax - maximumPoint.Y);//Distance(currentPos, maximumPoint);
+                if (currentDistance < minimalDistance)
+                {
+                    minimalDistance = currentDistance;
+                    bestPositions = currentPositions;
+                }
+
+            }
+            return To3D(bestPositions);
+        }
+
+        private static float Distance(Vector2 p1, Vector2 p2)
+        {
+            return (float)(Math.Sqrt(Math.Pow((p1.X - p2.X), 2) + Math.Pow((p1.Y - p2.Y), 2)));
         }
 
         public List<Vector3> Get3DPositions()
@@ -189,6 +238,14 @@ namespace ParabolicTrajectory
             foreach (Vector2 v in vectorList)
                 position3.Add(new Vector3(v, 0f));
             return position3;
+        }
+
+        public static List<Vector2> To2D(List<Vector3> vectorList)
+        {
+            List<Vector2> position2 = new List<Vector2>();
+            foreach (Vector3 v in vectorList)
+                position2.Add(new Vector2(v.X, v.Y));
+            return position2;
         }
     }
 }

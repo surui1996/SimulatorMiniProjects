@@ -21,12 +21,13 @@ namespace ParabolicTrajectory
         #region Constants and Formula Constants
         Color DEFAULT_COLOR = Color.CornflowerBlue;
         const float SCALE = 0.1f;
-        const float BIGGER = 85f;
+        const float DEFAULT_METER_TO_PIXEL = 85f; // 85 pixels is 1 meter
         const float kG = 9.8f, DT = 0.005f;
         private float dragCoefficient = 0.47f;
             
-            
         private float AIR_DENSITY = 1.2f, BALL_RADIUS = 0.305f, BALL_MASS = 1.0f;
+
+        public static float MetersToPixel = DEFAULT_METER_TO_PIXEL;  // how many pixels in 1 meter
         #endregion
 
         #region Properties
@@ -57,17 +58,15 @@ namespace ParabolicTrajectory
             this.ball2D = texture;
         }
 
-        private static List<Vector2> CalculateTrajectoryWithNoDrag(float vx, float vy, Vector2 initialPosition)
+        public static Vector2 CalculateMaximumPoint(List<Vector2> positions)
         {
-            List<Vector2> myPositions = new List<Vector2>();
-            Vector2 pos = Vector2.Zero;
-            for (float t = 0; t < 100.0f; t += DT)
+            Vector2 maxPoint = positions[0];
+            for (int i = 1; i < positions.Count; i++)
             {
-                //x = vx* t, y = vy*t - 0.5*g*t^2
-                pos = initialPosition + new Vector2(vx * t, -vy * t + 0.5f * kG * t * t) * BIGGER;
-                myPositions.Add(pos);
+                if (positions[i].Y < maxPoint.Y) // y axis is opposite
+                    maxPoint = positions[i];
             }
-            return myPositions;
+            return maxPoint;
         }
 
         public void CalculateTrajectoryWithNoDrag()
@@ -78,7 +77,7 @@ namespace ParabolicTrajectory
             {
                 //x = vx* t, y = vy*t - 0.5*g*t^2
                 pos = initialPosition + new Vector2(GetVX(initialVelocityMagnitude, InitialAngle) * t,
-                    -GetVY(initialVelocityMagnitude, InitialAngle) * t + 0.5f * kG * t * t) * BIGGER;
+                    -GetVY(initialVelocityMagnitude, InitialAngle) * t + 0.5f * kG * t * t) * MetersToPixel;
                 this.positions.Add(pos);
             }
             CalculateMaximumPoint();
@@ -93,7 +92,7 @@ namespace ParabolicTrajectory
             {
                 //vx(t) = vx, vy(t) = vy - g * t
                 currentVelocity.Y += kG * DT;
-                currentPosition += currentVelocity * DT * BIGGER; //we assume speed is constant over t=DT seconds
+                currentPosition += currentVelocity * DT * MetersToPixel; //we assume speed is constant over t=DT seconds
                 this.positions.Add(currentPosition);
             }
             CalculateMaximumPoint();
@@ -116,7 +115,7 @@ namespace ParabolicTrajectory
 
                 currentVelocity.X += dragAcceleration.X * DT;
                 currentVelocity.Y += (kG + dragAcceleration.Y) * DT;
-                currentPosition += currentVelocity * DT * BIGGER;
+                currentPosition += currentVelocity * DT * MetersToPixel;
                 this.positions.Add(currentPosition);
             }
             CalculateMaximumPoint();
@@ -131,17 +130,6 @@ namespace ParabolicTrajectory
                     maxPoint = positions[i];
             }
             maximumPoint = maxPoint;
-        }
-
-        public static Vector2 CalculateMaximumPoint(List<Vector2> positions)
-        {
-            Vector2 maxPoint = positions[0];
-            for (int i = 1; i < positions.Count; i++)
-            {
-                if (positions[i].Y < maxPoint.Y) // y axis is opposite
-                    maxPoint = positions[i];
-            }
-            return maxPoint;
         }
 
         private Vector2 NormalizeVector(Vector2 v)
@@ -164,18 +152,15 @@ namespace ParabolicTrajectory
 
         private bool HasBallReachedGround(int positionIndex)
         {
-            return positionIndex > 10 && Math.Abs(positions[positionIndex].Y - initialPosition.Y) < 1f;
+            return positionIndex > 10 && Math.Abs(positions[positionIndex].Y - initialPosition.Y) < MetersToPixel / 15;
         }
 
-        private static float GetVX(float velocity, float angle)
+        public List<Vector3> Get3DPositions()
         {
-            return velocity * (float)Math.Cos(MathHelper.ToRadians(angle));
+            return To3D(positions);
         }
 
-        private static float GetVY(float velocity, float angle)
-        {
-            return velocity * (float)Math.Sin(MathHelper.ToRadians(angle));
-        }
+
 
         public static List<Vector3> GetSimpleTrajectory(Vector2 maximumPoint, float maximumVelocityMagnitude, float initialAngle, Vector2 initialPosition)
         {
@@ -194,45 +179,68 @@ namespace ParabolicTrajectory
                     minimalDistance = currentDistance;
                     bestPositions = currentPositions;
                 }
-                
-            }
-            return To3D(bestPositions);            
-        }
-        //only with Y
-        public static List<Vector3> GetSimpleTrajectory2(Vector2 maximumPoint, float maximumVelocityMagnitude, float initialAngle, Vector2 initialPosition)
-        {
-            float minimalDistance = maximumPoint.Y;
-            float currentDistance;
-            List<Vector2> currentPositions, bestPositions = new List<Vector2>();
-            float currentMax;
-
-            for (float v = maximumVelocityMagnitude; v > 0.2f; v -= 0.1f)
-            {
-                currentPositions = new List<Vector2>(CalculateTrajectoryWithNoDrag(GetVX(v, initialAngle),
-                    GetVY(v, initialAngle), initialPosition));
-                currentMax = CalculateMaximumPoint(currentPositions).Y;
-                currentDistance = Math.Abs(currentMax - maximumPoint.Y);//Distance(currentPos, maximumPoint);
-                if (currentDistance < minimalDistance)
-                {
-                    minimalDistance = currentDistance;
-                    bestPositions = currentPositions;
-                }
 
             }
             return To3D(bestPositions);
         }
+        //only with Y, more effiecient
+        public static List<Vector3> GetSimpleTrajectory2(Vector2 maximumPoint, float maximumVelocityMagnitude, float initialAngle, Vector2 initialPosition)
+        {
+            float minimalDistance = maximumPoint.Y;
+            float currentDistance;
+            List<Vector2> bestPositions = new List<Vector2>();
+            float bestVelocity = 0f;
+            Vector2 currentMax, bestMax;
 
+            for (float v = maximumVelocityMagnitude; v > 0.2f; v -= 0.1f)
+            {
+                //x = v^2 * sin(2a) / 2g --- y = v^2 * sin^2(a) / 2g
+                float vSquared = (float)Math.Pow(v, 2);
+                float sin2 = (float)Math.Sin(2 * MathHelper.ToRadians(initialAngle));
+                float sinSquared = (float)Math.Pow(Math.Sin(MathHelper.ToRadians(initialAngle)), 2);
+                float twoG = 2 * kG;
+                currentMax = new Vector2(vSquared * sin2 / twoG, -vSquared * sinSquared / twoG) * MetersToPixel + initialPosition;
+                currentDistance = Math.Abs(currentMax.Y - maximumPoint.Y);
+                if (currentDistance < minimalDistance)
+                {
+                    minimalDistance = currentDistance;
+                    bestVelocity = v;
+                    bestMax = currentMax;
+                }
+
+            }
+            return To3D(CalculateTrajectoryWithNoDrag(GetVX(bestVelocity, initialAngle), GetVY(bestVelocity, initialAngle), initialPosition));
+        }
+
+        private static List<Vector2> CalculateTrajectoryWithNoDrag(float vx, float vy, Vector2 initialPosition)
+        {
+            List<Vector2> myPositions = new List<Vector2>();
+            Vector2 pos = Vector2.Zero;
+            for (float t = 0; t < 100.0f; t += DT)
+            {
+                //x = vx* t, y = vy*t - 0.5*g*t^2
+                pos = initialPosition + new Vector2(vx * t, -vy * t + 0.5f * kG * t * t) * MetersToPixel;
+                myPositions.Add(pos);
+            }
+            return myPositions;
+        }
+        
+        private static float GetVX(float velocity, float angle)
+        {
+            return velocity * (float)Math.Cos(MathHelper.ToRadians(angle));
+        }
+
+        private static float GetVY(float velocity, float angle)
+        {
+            return velocity * (float)Math.Sin(MathHelper.ToRadians(angle));
+        }
+        
         private static float Distance(Vector2 p1, Vector2 p2)
         {
             return (float)(Math.Sqrt(Math.Pow((p1.X - p2.X), 2) + Math.Pow((p1.Y - p2.Y), 2)));
         }
 
-        public List<Vector3> Get3DPositions()
-        {
-            return To3D(positions);
-        }
-
-        private static List<Vector3> To3D(List<Vector2> vectorList)
+        public static List<Vector3> To3D(List<Vector2> vectorList)
         {
             List<Vector3> position3 = new List<Vector3>();
             foreach (Vector2 v in vectorList)

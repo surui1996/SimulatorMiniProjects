@@ -9,11 +9,14 @@ namespace ParabolicTrajectory
 {
     public class Graph
     {
+        Camera camera;
         BasicEffect basicEffect;
         short[] lineListIndices;
 
-        public Graph(GraphicsDevice graphicsDevice)
+        public Graph(GraphicsDevice graphicsDevice, Camera camera)
         {
+            this.camera = camera;
+
             basicEffect = new BasicEffect(graphicsDevice);
             basicEffect.View = Matrix.CreateLookAt(Vector3.Backward, Vector3.Zero, Vector3.Up);
             basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, (float)graphicsDevice.Viewport.Width, (float)graphicsDevice.Viewport.Height, 0, 1.0f, 1000.0f);
@@ -34,7 +37,7 @@ namespace ParabolicTrajectory
 
             VertexPositionColor[] pointList = new VertexPositionColor[values.Count];
             for (int i = 0; i < values.Count; i++)
-                pointList[i] = new VertexPositionColor(values[i], color);
+                pointList[i] = new VertexPositionColor((values[i] * camera.Zoom) + new Vector3(camera.Translation, 0f), color);
 
             DrawLineList(pointList);
 
@@ -48,8 +51,8 @@ namespace ParabolicTrajectory
         public void DrawLine(Vector2 p1, Vector2 p2, Color color)
         {
             VertexPositionColor[] pointList = new VertexPositionColor[2];
-            pointList[0] = new VertexPositionColor(new Vector3(p1, 0), color);
-            pointList[1] = new VertexPositionColor(new Vector3(p2, 0), color);
+            pointList[0] = new VertexPositionColor((new Vector3(p1, 0)) * camera.Zoom + new Vector3(camera.Translation, 0f), color);
+            pointList[1] = new VertexPositionColor((new Vector3(p2, 0)) * camera.Zoom + new Vector3(camera.Translation, 0f), color);
 
             DrawLineList(pointList);
         }

@@ -26,7 +26,7 @@ namespace ParabolicTrajectory
         #endregion
 
         #region Constants
-        const int BALL_DIAMETER = 51, GROUND_LEN = 225;
+        const int GROUND_LEN = 225;
         const float X_POS = 50f, Y_POS = 400f, DEFAULT_VELOCITY = 10f, DEFAULT_ANGLE = 45f, DT = 0.005f, SCALE = 0.1f;
         Color DEFAULT_COLOR = Color.CornflowerBlue;
         #endregion
@@ -41,12 +41,12 @@ namespace ParabolicTrajectory
         #region Game Objects
         Graph graph;
         Ball ball, ball2, dragBall;
+        Camera camera;
         List<Vector3> simpleTrajectory; bool trajectoryIsNull = true;
         #endregion
 
         public TrajectoryGame()
         {
-
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -59,7 +59,8 @@ namespace ParabolicTrajectory
         /// </summary>
         protected override void Initialize()
         {
-            graph = new Graph(GraphicsDevice);
+            camera = new Camera();
+            graph = new Graph(GraphicsDevice, camera);
             base.Initialize();
         }
 
@@ -108,6 +109,18 @@ namespace ParabolicTrajectory
                 angle -= 0.05f;
             else if (state.IsKeyDown(Keys.A))
                 angle += 0.05f;
+            else if (state.IsKeyDown(Keys.Z))
+                camera.ZoomIn();
+            else if (state.IsKeyDown(Keys.X))
+                camera.ZoomOut();
+            else if (state.IsKeyDown(Keys.Up))
+                camera.Translate(Keys.Up);
+            else if (state.IsKeyDown(Keys.Down))
+                camera.Translate(Keys.Down);
+            else if (state.IsKeyDown(Keys.Left))
+                camera.Translate(Keys.Left);
+            else if (state.IsKeyDown(Keys.Right))
+                camera.Translate(Keys.Right);
             else if (state.IsKeyDown(Keys.Enter))
             {
                 //Trajectory 2 seems to be more of what i wanted...
@@ -120,7 +133,7 @@ namespace ParabolicTrajectory
             {
                 spaceClicked = true;
                 timeFromShot = 0;
-
+                positionIndex = 0;
                 ball.InitialAngle = angle;
                 ball.InitialVelocityMagnitude = velocity;
                 ball.CalculateTrajectoryWithNoDrag();
@@ -134,8 +147,9 @@ namespace ParabolicTrajectory
                 dragBall.CalculateTrajectoryWithDrag();
             }
             else if (!state.IsKeyDown(Keys.Space) && spaceClicked)
+            {
                 spaceClicked = false;
-
+            }
             base.Update(gameTime);
         }
 
@@ -147,7 +161,7 @@ namespace ParabolicTrajectory
         {
             GraphicsDevice.Clear(DEFAULT_COLOR);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, camera.Transform());
             DrawShootingParameters();
             DrawMovingBall(gameTime.ElapsedGameTime.Milliseconds / 1000f);
             DrawGround();

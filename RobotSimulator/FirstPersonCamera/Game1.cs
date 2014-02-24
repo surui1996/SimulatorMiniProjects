@@ -21,8 +21,8 @@ namespace RobotSimulator
         // Content
         BasicEffect effect;
 
-        MJPEGStreamer streamer;
-        ImageStreamingServer serverCoolio;
+        //MJPEGStreamer streamer;
+        ImageStreamingServer streamingServer;
 
         TexturedWall wallRed, wallBlue, carpet3;
         TexturedWall dynamicRightVision, staticRightVision;
@@ -31,7 +31,7 @@ namespace RobotSimulator
         Matrix proj;
 
         // Set the camera position and rotation variables.
-        Vector3 cameraPos = new Vector3(-50,  -(Field.HEIGHT_ABOVE_CARPET / 3) * Field.C, -500);
+        Vector3 cameraPos = new Vector3(-50, -(Field.HEIGHT_ABOVE_CARPET / 3) * Field.C, -500);
         float angleX, angleY;
 
         // Set the direction the camera points without rotation.
@@ -50,14 +50,16 @@ namespace RobotSimulator
 
         GraphicsDeviceManager graphics;
 
-        private MemoryStream memoryStream;// = new MemoryStream();
         public static object locker;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 320;
+            graphics.PreferredBackBufferHeight = 240;
+
             Content.RootDirectory = "Content";
-            
+
         }
 
         /// <summary>
@@ -69,8 +71,10 @@ namespace RobotSimulator
         protected override void Initialize()
         {
             base.Initialize();
-            graphics.PreferredBackBufferWidth = 640;
-            graphics.PreferredBackBufferHeight = 480;
+            //draw also backed traingles - doesn't help with the 0 z length vision targets
+            RasterizerState state = new RasterizerState();
+            state.CullMode = CullMode.None;
+            GraphicsDevice.RasterizerState = state;
         }
 
         /// <summary>
@@ -81,7 +85,6 @@ namespace RobotSimulator
         {
             locker = new object();
 
-            memoryStream = new MemoryStream();
             //carpet = Content.Load<Texture2D>("carpet");
             wallRed = new TexturedWall(Field.WIDTH, Field.HEIGHT_ABOVE_CARPET, 0,
                 new Vector3(Field.WIDTH / 2, Field.HEIGHT_ABOVE_CARPET / 2, 0),
@@ -93,7 +96,7 @@ namespace RobotSimulator
 
             dynamicRightVision = new TexturedWall(Field.DYNAMIC_WIDTH, Field.DYNAMIC_HEIGHT, 0.1f,
                 new Vector3(-Field.WIDTH / 2, -Field.HEIGHT_ABOVE_CARPET / 2, 0) +
-                new Vector3((Field.LOWGOAL_WIDTH +Field.LOWGOAL_WIDTH)/2,Field.DYNAMIC_HEIGHT_ABOVE_CARPET + Field.DYNAMIC_HEIGHT,0),
+                new Vector3((Field.LOWGOAL_WIDTH + Field.LOWGOAL_WIDTH) / 2, Field.DYNAMIC_HEIGHT_ABOVE_CARPET + Field.DYNAMIC_HEIGHT, 0),
                 Content.Load<Texture2D>("visionTarget"));
 
             staticRightVision = new TexturedWall(Field.STATIC_WIDTH, Field.STATIC_HEIGHT, 0.1f,
@@ -105,7 +108,7 @@ namespace RobotSimulator
 
 
             carpet3 = new TexturedWall(Field.WIDTH, 0, Field.HEIGHT,
-                new Vector3(Field.WIDTH/2, -Field.HEIGHT_ABOVE_CARPET / 2, 0),
+                new Vector3(Field.WIDTH / 2, -Field.HEIGHT_ABOVE_CARPET / 2, 0),
                 Content.Load<Texture2D>("carpet"));
 
             //Set up projection matrice
@@ -116,10 +119,10 @@ namespace RobotSimulator
 
             effect = new BasicEffect(GraphicsDevice);
 
-            streamer = new MJPEGStreamer();
+            //streamer = new MJPEGStreamer();
             //streamer.Start();
-            serverCoolio = new ImageStreamingServer();
-            serverCoolio.Start(4590);
+            streamingServer = new ImageStreamingServer();
+            streamingServer.Start(4590);
         }
 
         /// <summary>
@@ -128,10 +131,10 @@ namespace RobotSimulator
         /// </summary>
         protected override void UnloadContent()
         {
-            
+
         }
 
-        
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -211,7 +214,7 @@ namespace RobotSimulator
         void UpdateMatrices()
         {
             Matrix rotationMatrix = Matrix.CreateRotationY(angleX) * Matrix.CreateRotationX(angleY);
-            
+
             // Create a vector pointing the direction the camera is facing.
             Vector3 transformedReference = Vector3.Transform(cameraReference, rotationMatrix);
 
@@ -230,16 +233,19 @@ namespace RobotSimulator
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(Color.SteelBlue);
-
+            graphics.GraphicsDevice.Clear(Color.Black);
             DrawWithEffect();
             base.Draw(gameTime);
+
+
             NewFrame();
+
+
             graphics.GraphicsDevice.Clear(Color.Black);
             DrawWithEffect();
             base.Draw(gameTime);
         }
-        
+
         private void DrawWithEffect()
         {
             effect.TextureEnabled = true;
@@ -247,14 +253,11 @@ namespace RobotSimulator
             effect.Projection = proj;
             effect.View = view;
 
-            // Enable some pretty lights
-            //cubeEffect.EnableDefaultLighting();
-
             // apply the effect and render the cube
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                
+
                 wallRed.Draw(GraphicsDevice);
             }
 
@@ -284,51 +287,35 @@ namespace RobotSimulator
             }
         }
         public static MemoryStream ImageStream;
+        public static byte[] ImageBuffer;
         public static bool FrameRecieved;
-        
+
         private void NewFrame()
         {
-            
-            //string counter = count.ToString();
-
             int w = GraphicsDevice.PresentationParameters.BackBufferWidth;
             int h = GraphicsDevice.PresentationParameters.BackBufferHeight;
-
-            //force a frame to be drawn (otherwise back buffer is empty) 
-            //Draw(new GameTime());
 
             //pull the picture from the buffer 
             int[] backBuffer = new int[w * h];
             GraphicsDevice.GetBackBufferData(backBuffer);
             byte[] result = new byte[backBuffer.Length * sizeof(int)];
             Buffer.BlockCopy(backBuffer, 0, result, 0, result.Length);
-            //MemoryStream mem = new MemoryStream(result);
-            //ImageStream = mem;
-            //FrameRecieved = true;
-            //streamer.OnNewFrame(result);
 
-            ////copy into a texture 
-            Texture2D texture = new Texture2D(GraphicsDevice, w, h, false, GraphicsDevice.PresentationParameters.BackBufferFormat);
-            texture.SetData(backBuffer);
-
-            ////save to disk 
-            //NetworkStream stream; //=File.OpenWrite(@"C:\Users\דורון\Desktop\FirstPersonCamera\FirstPersonCamera" +@"\" + counter + ".jpg");
-
-            //stream = new NetworkStream(new Socket(0));
-            
-            //memoryStream.Dispose();
-            //memoryStream = new MemoryStream();
-            lock (locker)
+            using (Texture2D texture = new Texture2D(GraphicsDevice, w, h, false, GraphicsDevice.PresentationParameters.BackBufferFormat))
             {
-                //memoryStream.Capacity = 0;
-                texture.SaveAsJpeg(memoryStream, w, h);
-                ImageStream = memoryStream;
-            }
-            
-            FrameRecieved = true;
-            //stream.Dispose();
+                texture.SetData(backBuffer);
 
-            //texture.Dispose();
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    texture.SaveAsJpeg(ms, w, h);
+                    lock (locker)
+                    {
+                        ImageBuffer = ms.GetBuffer();
+                    }
+                }
+            }
+
+            FrameRecieved = true;
         }
 
     }

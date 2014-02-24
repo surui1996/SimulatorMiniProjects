@@ -49,7 +49,6 @@ namespace RobotSimulator
         {
             byte[] header = CreateHeader(imgBuffer.Length);
             byte[] footer = CreateFooter();
-
             
             byte[] frame = new byte[header.Length + imgBuffer.Length + footer.Length];
             System.Array.Copy(header, 0, frame, 0, header.Length);

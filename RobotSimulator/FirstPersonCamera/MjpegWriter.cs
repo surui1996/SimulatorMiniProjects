@@ -17,7 +17,6 @@ namespace RobotSimulator
 
         public MjpegWriter(Stream stream, string boundary)
         {
-
             this.Stream = stream;
             this.Boundary = boundary;
         }
@@ -44,6 +43,13 @@ namespace RobotSimulator
             this.Write(ms);
         }
 
+        private static MemoryStream BytesOf(Image image)
+        {
+            MemoryStream ms = new MemoryStream();
+            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            return ms;
+        }
+
         public void Write(MemoryStream imageStream)
         {
             StringBuilder sb = new StringBuilder();
@@ -59,7 +65,23 @@ namespace RobotSimulator
             Write("\r\n");
 
             this.Stream.Flush();
+        }
 
+        public void Write(byte[] buffer)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine();
+            sb.AppendLine(this.Boundary);
+            sb.AppendLine("Content-Type: image/jpeg");
+            sb.AppendLine("Content-Length: " + buffer.Length.ToString());
+            sb.AppendLine();
+
+            Write(sb.ToString());
+            this.Stream.Write(buffer, 0, buffer.Length);
+            Write("\r\n");
+
+            this.Stream.Flush();
         }
 
         private void Write(string text)
@@ -73,23 +95,14 @@ namespace RobotSimulator
             return Encoding.ASCII.GetBytes(text);
         }
 
-        private static MemoryStream BytesOf(Image image)
-        {
-            MemoryStream ms = new MemoryStream();
-            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-            return ms;
-        }
-
         #region IDisposable Members
 
         public void Dispose()
         {
-
             try
             {
                 if (this.Stream != null)
                     this.Stream.Dispose();
-
             }
             finally
             {

@@ -16,35 +16,16 @@ namespace RobotSimulator
     /// </summary>
     public class ImageStreamingServer : IDisposable
     {
-        private List<Socket> _Clients;
-        private Thread _Thread;
+        private List<Socket> streamClients;
+        private Thread serverThread;
 
         public ImageStreamingServer()
-            //: this(Screen.Snapshots(600, 450, true))
         {
-            _Clients = new List<Socket>();
-            _Thread = null;
+            streamClients = new List<Socket>();
+            serverThread = null;
 
-            //this.ImagesSource = imagesSource;
             this.Interval = 50;
         }
-
-        public ImageStreamingServer(IEnumerable<Image> imagesSource)
-        {
-
-            _Clients = new List<Socket>();
-            _Thread = null;
-
-            this.ImagesSource = imagesSource;
-            this.Interval = 50;
-
-        }
-
-        /// <summary>
-        /// Gets or sets the source of images that will be streamed to the 
-        /// any connected client.
-        /// </summary>
-        public IEnumerable<Image> ImagesSource { get; set; }
 
         /// <summary>
         /// Gets or sets the interval in milliseconds (or the delay time) between 
@@ -55,13 +36,13 @@ namespace RobotSimulator
         /// <summary>
         /// Gets a collection of client sockets.
         /// </summary>
-        public IEnumerable<Socket> Clients { get { return _Clients; } }
+        public IEnumerable<Socket> Clients { get { return streamClients; } }
 
         /// <summary>
         /// Returns the status of the server. True means the server is currently 
         /// running and ready to serve any client requests.
         /// </summary>
-        public bool IsRunning { get { return (_Thread != null && _Thread.IsAlive); } }
+        public bool IsRunning { get { return (serverThread != null && serverThread.IsAlive); } }
 
         /// <summary>
         /// Starts the server to accepts any new connections on the specified port.
@@ -69,12 +50,11 @@ namespace RobotSimulator
         /// <param name="port"></param>
         public void Start(int port)
         {
-
             lock (this)
             {
-                _Thread = new Thread(new ParameterizedThreadStart(ServerThread));
-                _Thread.IsBackground = true;
-                _Thread.Start(port);
+                serverThread = new Thread(new ParameterizedThreadStart(ServerThread));
+                serverThread.IsBackground = true;
+                serverThread.Start(port);
             }
 
         }
@@ -94,16 +74,16 @@ namespace RobotSimulator
             {
                 try
                 {
-                    _Thread.Join();
-                    _Thread.Abort();
+                    serverThread.Join();
+                    serverThread.Abort();
                 }
                 finally
                 {
 
-                    lock (_Clients)
+                    lock (streamClients)
                     {
 
-                        foreach (var s in _Clients)
+                        foreach (var s in streamClients)
                         {
                             try
                             {
@@ -111,11 +91,11 @@ namespace RobotSimulator
                             }
                             catch { }
                         }
-                        _Clients.Clear();
+                        streamClients.Clear();
 
                     }
 
-                    _Thread = null;
+                    serverThread = null;
                 }
             }
         }
@@ -153,10 +133,10 @@ namespace RobotSimulator
         {
             Socket socket = (Socket)client;
 
-            System.Diagnostics.Debug.WriteLine(string.Format("New client from {0}", socket.RemoteEndPoint.ToString()));
+            //System.Diagnostics.Debug.WriteLine(string.Format("New client from {0}", socket.RemoteEndPoint.ToString()));
 
-            lock (_Clients)
-                _Clients.Add(socket);
+            lock (streamClients)
+                streamClients.Add(socket);
 
             try
             {
@@ -166,35 +146,25 @@ namespace RobotSimulator
                     // Writes the response header to the client.
                     wr.WriteHeader();
 
-                    //// Streams the images from the source to the client.
-                    //foreach (var imgStream in Screen.Streams(this.ImagesSource))
-                    //{
-                    //    if (this.Interval > 0)
-                    //        Thread.Sleep(this.Interval);
-
-                    //    wr.Write(imgStream);
-                    //}
-
                     while (true)
                     {
-                        if (this.Interval > 0)
-                            Thread.Sleep(this.Interval);
                         if (Game1.FrameRecieved)
                         {
-                            if (Game1.ImageStream != null)
+                            if (Game1.ImageBuffer != null)
                             {
                                 lock (Game1.locker)
                                 {
-                                    wr.Write(Game1.ImageStream);
-                                    Game1.ImageStream.SetLength(0);
-                                    Game1.ImageStream.Capacity = 0; 
+                                    wr.Write(Game1.ImageBuffer);
+                                    Game1.ImageBuffer = null;
                                 }
                                 
                                 //Game1.ImageStream.Dispose();
                             }
                             Game1.FrameRecieved = false;
                         }
-                        //Game1.ImageStream.Close();
+
+                        if (this.Interval > 0)
+                            Thread.Sleep(this.Interval);
                     }
 
                 }
@@ -202,8 +172,8 @@ namespace RobotSimulator
             catch { }
             finally
             {
-                lock (_Clients)
-                    _Clients.Remove(socket);
+                lock (streamClients)
+                    streamClients.Remove(socket);
             }
         }
 
@@ -225,78 +195,6 @@ namespace RobotSimulator
             while (true)
                 yield return server.Accept();
         }
-    }
-
-
-    static class Screen
-    {
-        /// <summary>
-        /// Returns a 
-        /// </summary>
-        /// <param name="delayTime"></param>
-        /// <returns></returns>
-        public static IEnumerable<Image> Snapshots(int width, int height, bool showCursor)
-        {
-            Size size = new Size(0, 0);
-
-            Bitmap srcImage = new Bitmap(size.Width, size.Height);
-            Graphics srcGraphics = Graphics.FromImage(srcImage);
-
-            bool scaled = (width != size.Width || height != size.Height);
-
-            Bitmap dstImage = srcImage;
-            Graphics dstGraphics = srcGraphics;
-
-            if (scaled)
-            {
-                dstImage = new Bitmap(width, height);
-                dstGraphics = Graphics.FromImage(dstImage);
-            }
-
-            Rectangle src = new Rectangle(0, 0, size.Width, size.Height);
-            Rectangle dst = new Rectangle(0, 0, width, height);
-            Size curSize = new Size(32, 32);
-
-            while (true)
-            {
-                srcGraphics.CopyFromScreen(0, 0, 0, 0, size);
-
-                //if (showCursor)
-                //    Cursors.Default.Draw(srcGraphics, new Rectangle(Cursor.Position, curSize));
-
-                if (scaled)
-                    dstGraphics.DrawImage(srcImage, dst, src, GraphicsUnit.Pixel);
-
-                yield return dstImage;
-
-            }
-
-            srcGraphics.Dispose();
-            dstGraphics.Dispose();
-
-            srcImage.Dispose();
-            dstImage.Dispose();
-
-            yield break;
-        }
-
-        internal static IEnumerable<MemoryStream> Streams(this IEnumerable<Image> source)
-        {
-            MemoryStream ms = new MemoryStream();
-
-            foreach (var img in source)
-            {
-                ms.SetLength(0);
-                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                yield return ms;
-            }
-
-            ms.Close();
-            ms = null;
-
-            yield break;
-        }
-
     }
 }
 

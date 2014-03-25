@@ -41,6 +41,7 @@ namespace RobotSimulator
         {
             MemoryStream ms = BytesOf(image);
             this.Write(ms);
+            ms.Dispose();
         }
 
         private static MemoryStream BytesOf(Image image)

@@ -1,0 +1,14 @@
+C:\Users\דורון\AppData\Local\Temporary Projects\PythonCsCommunication\bin\Debug\PythonCsCommunication.exe
+C:\Users\דורון\AppData\Local\Temporary Projects\PythonCsCommunication\bin\Debug\PythonCsCommunication.pdb
+C:\Users\דורון\AppData\Local\Temporary Projects\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.exe
+C:\Users\דורון\AppData\Local\Temporary Projects\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.pdb
+C:\Users\דורון\documents\visual studio 2010\Projects\PythonCsCommunication\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.exe
+C:\Users\דורון\documents\visual studio 2010\Projects\PythonCsCommunication\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.pdb
+C:\Users\דורון\documents\visual studio 2010\Projects\PythonCsCommunication\PythonCsCommunication\bin\Debug\PythonCsCommunication.exe
+C:\Users\דורון\documents\visual studio 2010\Projects\PythonCsCommunication\PythonCsCommunication\bin\Debug\PythonCsCommunication.pdb
+C:\Users\דורון\documents\visual studio 2010\Projects\PythonCsCommunication\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.csprojResolveAssemblyReference.cache
+C:\Users\דורון\Documents\GitHub\Simulator\PythonCsCommunication\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.exe
+C:\Users\דורון\Documents\GitHub\Simulator\PythonCsCommunication\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.pdb
+C:\Users\דורון\Documents\GitHub\Simulator\PythonCsCommunication\PythonCsCommunication\bin\Debug\PythonCsCommunication.exe
+C:\Users\דורון\Documents\GitHub\Simulator\PythonCsCommunication\PythonCsCommunication\bin\Debug\PythonCsCommunication.pdb
+C:\Users\דורון\Documents\GitHub\Simulator\PythonCsCommunication\PythonCsCommunication\obj\x86\Debug\PythonCsCommunication.csprojResolveAssemblyReference.cache

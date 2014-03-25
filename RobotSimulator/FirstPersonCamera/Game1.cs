@@ -122,7 +122,7 @@ namespace RobotSimulator
             //streamer = new MJPEGStreamer();
             //streamer.Start();
             streamingServer = new ImageStreamingServer();
-            streamingServer.Start(4590);
+            streamingServer.Start(80);
         }
 
         /// <summary>
@@ -289,6 +289,8 @@ namespace RobotSimulator
         public static MemoryStream ImageStream;
         public static byte[] ImageBuffer;
         public static bool FrameRecieved;
+        private Texture2D texture;
+        private MemoryStream ms;
 
         private void NewFrame()
         {
@@ -301,11 +303,11 @@ namespace RobotSimulator
             byte[] result = new byte[backBuffer.Length * sizeof(int)];
             Buffer.BlockCopy(backBuffer, 0, result, 0, result.Length);
 
-            using (Texture2D texture = new Texture2D(GraphicsDevice, w, h, false, GraphicsDevice.PresentationParameters.BackBufferFormat))
+            using (texture = new Texture2D(GraphicsDevice, w, h, false, GraphicsDevice.PresentationParameters.BackBufferFormat))
             {
                 texture.SetData(backBuffer);
 
-                using (MemoryStream ms = new MemoryStream())
+                using (ms = new MemoryStream())
                 {
                     texture.SaveAsJpeg(ms, w, h);
                     lock (locker)

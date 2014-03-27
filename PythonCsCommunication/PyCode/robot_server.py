@@ -17,12 +17,15 @@ class RobotServer(Thread):
 		self.robotValues["Gyro"] = 0.0
 		self.robotValues["Accelerometer"] = 0.0
 	
+	def IsUp(self):
+		return self.client is not None
+	
 	#TODO: add checks whether the name is valid
 	def SendGetRequest(self, name):
 		get = "GET " + name + ";"
 		self.client.send(get)
 	
-	def SendSetRespone(self, name, value):
+	def SendSetRequest(self, name, value):
 		self.robotValues[name] = value
 		set = "SET " + name + "=" + str(value) + ";"
 		self.client.send(set)
@@ -30,12 +33,12 @@ class RobotServer(Thread):
 	def SetInDictionary(self, response):
 		s = response.split("=")
 		self.robotValues[s[0]] = float(s[1])
-		self.client.send("Hi I got from you " + s[0] + ":" + str(self.robotValues[s[0]]))
+		self.client.send("Hi I got from you " + s[0] + ":" + str(self.robotValues[s[0]]) + ";")
 	
 	def run(self):
 		port = 4590
 		self.sock.bind(('127.0.0.1', port))
-		self.sock.listen(5)
+		self.sock.listen(1)
 		self.client, addr = self.sock.accept()
 
 		while True:
@@ -45,6 +48,4 @@ class RobotServer(Thread):
 					if r != "":
 						self.SetInDictionary(r)
 			
-			time.sleep(0.02)
-			
-			
+			time.sleep(1)

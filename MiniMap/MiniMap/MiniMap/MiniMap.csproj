@@ -90,6 +90,9 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Soopah.Xna.Input">
+      <HintPath>..\..\..\..\..\..\Downloads\Soopah.Xna.Input.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -107,6 +110,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Joystick.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
@@ -115,6 +119,7 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="Soopah.Xna.Input.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MiniMapContent\MiniMapContent.contentproj">

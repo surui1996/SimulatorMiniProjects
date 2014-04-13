@@ -44,10 +44,15 @@ namespace PythonCsCommunication
                 client.Receive(buffer);
                 string request = GetString(buffer);
 
-                ParseRequests(request);
+                try
+                {
+                    ParseRequests(request);
+                }
+                catch { }
+                
 
                 Console.WriteLine(request);
-                System.Threading.Thread.Sleep(1000);
+                robotValues["Gyro"] += 0.01f;
             }
         }
 

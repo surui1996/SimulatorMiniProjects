@@ -9,40 +9,52 @@ namespace MiniMap
     class Robot
     {
         //m.k.s., degrees
-        
-        public double GyroAngle { get; set; }
-        public double EncoderRight { get; set; }
-        public double EncoderLeft { get; set; }
 
-        public double RightOutput { get; set; }
-        public double LeftOutput { get; set; }
+        public float GyroAngle { get; set; }
+        public float EncoderRight { get; set; }
+        public float EncoderLeft { get; set; }
+
+        public float RightOutput { get; set; }
+        public float LeftOutput { get; set; }
 
         public Vector2 Position { get; set; }
+        public float Orientation { get; set; }
 
-        private double absoluteAngle;
-        private Vector2 velocity;
+        private float vL, vR, velocity, angularVelocity;
+        private const float maximumVelocity = 6f; //m/s
+        private const float chassisWidth = 0.5f; //m
+        private float metersToPixel;
 
-        //the acceleration will change only when the motors output change, and after some time there will be a const velocity
-        //public Vector2 Acceleration { get; set; }
-        //private static double frictionAcceleration; //maybe add static and dynamic
-        private static double outputToVelocity;
-
-        public Robot()
+        public Robot(Vector2 position, float metersToPixel)
         {
             GyroAngle = 0;
             EncoderRight = 0;
             EncoderLeft = 0;
             RightOutput = 0;
             LeftOutput = 0;
-            Position = Vector2.Zero;
-            velocity = Vector2.Zero;
+            Position = position;
+            Orientation = MathHelper.ToRadians(0);
+            this.metersToPixel = metersToPixel;
         }
 
-        public void Update(double dt) //dt = timeSinceLastUpdate
+        public void Update(float dt) //dt = timeSinceLastUpdate
         {
-            Position += (float)dt * velocity;
+            Position += velocity * new Vector2((float)Math.Cos(Orientation),
+                    (float)Math.Sin(Orientation)) * dt * metersToPixel;
+            Orientation += angularVelocity * dt;
+            
+            EncoderLeft += vL * dt;
+            EncoderRight += vR * dt;
 
+            GyroAngle += MathHelper.ToDegrees(angularVelocity * dt);
+        }
 
+        private void SetOutputs(float right, float Left)
+        {
+            vR = right * maximumVelocity;
+            vL = Left * maximumVelocity;
+            velocity = (vR + vL) / 2;
+            angularVelocity = (vR - vL) / chassisWidth;
         }
 
         public void ResetGyro()
@@ -61,10 +73,9 @@ namespace MiniMap
             //TODO: copy from wpilib
         }
 
-        public void TankDrive(double right, double left)
+        public void TankDrive(float right, float left)
         {
-            RightOutput = right;
-            LeftOutput = left;
+            SetOutputs(right, left);
         }
     }
 }

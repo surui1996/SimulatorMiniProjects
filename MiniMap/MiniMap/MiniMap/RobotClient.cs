@@ -63,9 +63,9 @@ namespace MiniMap
                         Keys key = (Keys)Enum.Parse(typeof(Keys),
                             requests[i].Split(new string[] { "KEY " },
                             StringSplitOptions.None)[1]);
-
+                        
                         //TODO: find a prettier way..
-                        if(Game1.keyboardState.IsKeyDown(Keys.Space))
+                        if(Game1.keyboardState.IsKeyDown(key))
                             client.Send(GetBytes("KEY " + key.ToString() +  "=True;"));
                         else
                             client.Send(GetBytes("KEY " + key.ToString() + "=False;")); 

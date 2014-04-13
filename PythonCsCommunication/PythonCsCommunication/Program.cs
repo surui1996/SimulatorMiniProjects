@@ -13,7 +13,7 @@ namespace PythonCsCommunication
     {
         static void Main(string[] args)
         {
-            string directory = @"C:\try\t.py";
+            string directory = @"C:\try\my_robot.py";
             byte[] directoryBytes = Encoding.Default.GetBytes(directory);
             directory = Encoding.UTF8.GetString(directoryBytes);
 

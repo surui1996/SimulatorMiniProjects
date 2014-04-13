@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Soopah.Xna.Input;
+using System.Diagnostics;
+using System.Text;
 namespace MiniMap
 {
     /// <summary>
@@ -45,6 +47,7 @@ namespace MiniMap
         protected override void Initialize()
         {
             base.Initialize();
+            RunPythonServer();
         }
 
         /// <summary>
@@ -69,6 +72,8 @@ namespace MiniMap
             // TODO: Unload any non ContentManager content here
         }
 
+        public static KeyboardState keyboardState;
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -76,19 +81,18 @@ namespace MiniMap
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-            //DirectInputGamepad gamePad = DirectInputGamepad.Gamepads[0]
-            //DirectInputGamepad.Gamepads[0].Buttons.List.
-
+            keyboardState = Keyboard.GetState();
+            
             // Allows the game to exit
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 this.Exit();
                 return;
             }
-            else if (keyboardState.IsKeyDown(Keys.W))
+            else if (keyboardState.IsKeyDown(Keys.Space))
             {
                 robot.TankDrive(0.5f, 0.5f);
+
             }
             else if (keyboardState.IsKeyDown(Keys.A))
             {
@@ -104,6 +108,29 @@ namespace MiniMap
 
             base.Update(gameTime);
         }
+
+        void RunPythonServer()
+        {
+            string directory = @"C:\try\my_robot.py";
+            byte[] directoryBytes = Encoding.Default.GetBytes(directory);
+            directory = Encoding.UTF8.GetString(directoryBytes);
+
+            RunPyScript(directory);
+
+            RobotClient client = new RobotClient(robot);
+            client.Start();
+        }
+
+        private static void RunPyScript(string scriptName)
+        {
+            Process p = new Process();
+            p.StartInfo.FileName = "python.exe";
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.UseShellExecute = false; // make sure we can read the output from stdout
+            p.StartInfo.Arguments = scriptName; // add other parameters if necessary
+            p.Start(); // start the process (the python program)
+        }
+
 
         /// <summary>
         /// This is called when the game should draw itself.

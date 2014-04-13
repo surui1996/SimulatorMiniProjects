@@ -101,12 +101,12 @@ class SimpleRobot(RobotBase):
             if self.IsDisabled():
                 self.Disabled()
                 while self.IsDisabled():
-                    self.Wait(0.02)
+                    self.Wait(0.005)
             elif self.IsAutonomous():
                 self.Autonomous()
                 while self.IsAutonomous() and self.IsEnabled():
-                    self.Wait(0.02)
+                    self.Wait(0.005)
             elif self.IsOperatorControl():
                 self.OperatorControl()
                 while self.IsOperatorControl() and self.IsEnabled():
-                    self.Wait(0.02)
+                    self.Wait(0.005)

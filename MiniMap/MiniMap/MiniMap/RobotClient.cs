@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MiniMap
 {
+    enum RobotState { Auto, Teleop, Disabled }
+
     class RobotClient
     {
         Thread clientThread;
@@ -27,6 +29,11 @@ namespace MiniMap
         public void Start()
         {
             clientThread.Start();
+        }
+
+        public void SetState(RobotState state)
+        {
+            client.Send(GetBytes("STATE " + state.ToString().ToUpper()));
         }
 
         private void ListenToServer()
@@ -125,6 +132,8 @@ namespace MiniMap
         {
             return Encoding.ASCII.GetBytes(text);
         }
+
+        
 
     }
 }

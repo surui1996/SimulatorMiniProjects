@@ -23,6 +23,9 @@ namespace MiniMap
 
         Texture2D map, chassis;
         Robot robot;
+        RobotClient client;
+
+        public static KeyboardState keyboardState;
 
         float metersToPixel;
 
@@ -50,6 +53,28 @@ namespace MiniMap
             RunPythonServer();
         }
 
+        void RunPythonServer()
+        {
+            string directory = @"C:\try\my_robot.py";
+            byte[] directoryBytes = Encoding.Default.GetBytes(directory);
+            directory = Encoding.UTF8.GetString(directoryBytes);
+
+            RunPyScript(directory);
+
+            client = new RobotClient(robot);
+            client.Start();
+        }
+
+        private static void RunPyScript(string scriptName)
+        {
+            Process p = new Process();
+            p.StartInfo.FileName = "python.exe";
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.UseShellExecute = false; // make sure we can read the output from stdout
+            p.StartInfo.Arguments = scriptName; // add other parameters if necessary
+            p.Start(); // start the process (the python program)
+        }
+
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
@@ -72,8 +97,6 @@ namespace MiniMap
             // TODO: Unload any non ContentManager content here
         }
 
-        public static KeyboardState keyboardState;
-
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -89,46 +112,23 @@ namespace MiniMap
                 this.Exit();
                 return;
             }
-            else if (keyboardState.IsKeyDown(Keys.Space))
+            else if (keyboardState.IsKeyDown(Keys.F1))
             {
-                robot.TankDrive(0.5f, 0.5f);
-
+                client.SetState(RobotState.Teleop);
             }
-            else if (keyboardState.IsKeyDown(Keys.A))
+            else if (keyboardState.IsKeyDown(Keys.F2))
             {
-                robot.TankDrive(0.9f, 1f);
+                client.SetState(RobotState.Auto);
             }
-            else if (keyboardState.IsKeyDown(Keys.S))
+            else if (keyboardState.IsKeyDown(Keys.F3))
             {
-                robot.TankDrive(-0.3f, 0.3f);
+                client.SetState(RobotState.Disabled);
             }
 
             robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             
 
             base.Update(gameTime);
-        }
-
-        void RunPythonServer()
-        {
-            string directory = @"C:\try\my_robot.py";
-            byte[] directoryBytes = Encoding.Default.GetBytes(directory);
-            directory = Encoding.UTF8.GetString(directoryBytes);
-
-            RunPyScript(directory);
-
-            RobotClient client = new RobotClient(robot);
-            client.Start();
-        }
-
-        private static void RunPyScript(string scriptName)
-        {
-            Process p = new Process();
-            p.StartInfo.FileName = "python.exe";
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.UseShellExecute = false; // make sure we can read the output from stdout
-            p.StartInfo.Arguments = scriptName; // add other parameters if necessary
-            p.Start(); // start the process (the python program)
         }
 
 

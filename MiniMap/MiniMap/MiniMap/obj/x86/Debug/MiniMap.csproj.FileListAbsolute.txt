@@ -8,3 +8,6 @@ C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\obj\x86\D
 C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\chassis.xnb
 C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Soopah.Xna.Input.dll
 C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\arrow.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\visionBlue.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\visionRed.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\carpet3D.xnb

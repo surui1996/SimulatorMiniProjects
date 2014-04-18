@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 
-namespace RobotSimulator
+namespace MiniMap.Animation3D
 {
     class Field
     {
@@ -36,7 +36,7 @@ namespace RobotSimulator
 
             carpet3 = new TexturedWall(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT,
                 new Vector3(FieldConstants.WIDTH / 2, -FieldConstants.HEIGHT_ABOVE_CARPET / 2, 0),
-                content.Load<Texture2D>("carpet"));
+                content.Load<Texture2D>("carpet3D"));
         }
 
         public void Draw(GraphicsDevice graphicsDevice, BasicEffect effect)

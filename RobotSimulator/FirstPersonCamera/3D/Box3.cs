@@ -29,10 +29,10 @@ namespace RobotSimulator
 
         public Box3(float x, float y, float z, Vector3 position)
         {
-            x = -x * Field.C;
-            y = -y * Field.C;
-            z = -z * Field.C;
-            position = position * Field.C;
+            x = -x * FieldConstants.C;
+            y = -y * FieldConstants.C;
+            z = -z * FieldConstants.C;
+            position = position * FieldConstants.C;
             //position -= new Vector3((int)((float)x / 2), (int)((float)y / 2), 0); 
 
             topLeftFront = position;

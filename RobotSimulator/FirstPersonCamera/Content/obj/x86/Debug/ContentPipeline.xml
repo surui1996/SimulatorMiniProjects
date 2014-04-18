@@ -64,6 +64,24 @@
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\bin\x86\Debug\Content\visionRed0.xnb</Output>
       <Time>2014-02-03T10:03:06.5929587+02:00</Time>
     </Item>
+    <Item>
+      <Source>grey.png</Source>
+      <Name>grey</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\bin\x86\Debug\Content\grey.xnb</Output>
+      <Time>2014-04-16T20:04:44.8985203+03:00</Time>
+    </Item>
+    <Item>
+      <Source>earth.png</Source>
+      <Name>earth</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\bin\x86\Debug\Content\earth.xnb</Output>
+      <Time>2014-04-18T13:56:27.3008252+03:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

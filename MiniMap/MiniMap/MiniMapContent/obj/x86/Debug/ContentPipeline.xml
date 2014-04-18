@@ -8,7 +8,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\carpet.xnb</Output>
-      <Time>2014-04-13T15:59:55.3877962+03:00</Time>
+      <Time>2014-04-18T23:55:26.2566726+03:00</Time>
     </Item>
     <Item>
       <Source>chassis.png</Source>
@@ -27,6 +27,33 @@
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\arrow.xnb</Output>
       <Time>2014-04-13T15:30:49.3863253+03:00</Time>
+    </Item>
+    <Item>
+      <Source>visionBlue.png</Source>
+      <Name>visionBlue</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\visionBlue.xnb</Output>
+      <Time>2014-04-18T23:24:34.9062703+03:00</Time>
+    </Item>
+    <Item>
+      <Source>visionRed.jpg</Source>
+      <Name>visionRed</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\visionRed.xnb</Output>
+      <Time>2014-04-18T23:24:34.9218591+03:00</Time>
+    </Item>
+    <Item>
+      <Source>carpet3D.png</Source>
+      <Name>carpet3D</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\carpet3D.xnb</Output>
+      <Time>2014-04-18T23:55:51.053454+03:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

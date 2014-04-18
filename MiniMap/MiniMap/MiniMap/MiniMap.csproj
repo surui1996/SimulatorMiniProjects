@@ -110,10 +110,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation3D\Box3D.cs" />
+    <Compile Include="Animation3D\Field.cs" />
+    <Compile Include="Animation3D\FieldConstants.cs" />
+    <Compile Include="Animation3D\TexturedWall.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Robot.cs" />
+    <Compile Include="RobotOld.cs" />
     <Compile Include="RobotClient.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +158,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

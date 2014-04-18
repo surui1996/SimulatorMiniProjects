@@ -14,6 +14,7 @@ namespace MiniMap
     {
         Thread clientThread;
         Socket client;
+        //RobotOld robot;      
         Robot robot;      
 
         public RobotClient(Robot robot)

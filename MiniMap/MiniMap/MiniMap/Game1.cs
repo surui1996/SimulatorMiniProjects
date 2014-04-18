@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Media;
 using Soopah.Xna.Input;
 using System.Diagnostics;
 using System.Text;
+using MiniMap.Animation3D;
 namespace MiniMap
 {
     /// <summary>
@@ -22,8 +23,29 @@ namespace MiniMap
         SpriteBatch spriteBatch;
 
         Texture2D map, chassis;
-        Robot robot;
+        //RobotOld robotOld;
         RobotClient client;
+
+        // Content
+        BasicEffect effect3D;
+        Field field;
+        Robot robot;
+        Matrix proj;
+
+        // Set rates in world units per 1/60th second (the default fixed-step interval).
+        float rotationSpeed = 1f / (4f * FieldConstants.C);
+        float forwardSpeed = 5f / (FieldConstants.C);
+
+        // Set field of view of the camera in radians (pi/4 is 45 degrees).
+        static float viewAngle = MathHelper.ToRadians(45f);
+
+        // Set distance from the camera of the near and far clipping planes.
+        static float nearClip = 1.0f;
+        static float farClip = 10000.0f;
+
+
+        private const int MiniMapLong = 741 / 4;
+        private const int MiniMapShort = 335 / 4;
 
         public static KeyboardState keyboardState;
 
@@ -34,11 +56,24 @@ namespace MiniMap
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            graphics.PreferredBackBufferWidth = 741 / 2;
-            graphics.PreferredBackBufferHeight = 335 / 2;
-            metersToPixel = (float)graphics.PreferredBackBufferWidth / 16.45f;
-            robot = new Robot(new Vector2(graphics.PreferredBackBufferWidth / 2,
-                graphics.PreferredBackBufferHeight / 2), metersToPixel); 
+            //graphics.IsFullScreen = true;
+            graphics.PreferredBackBufferWidth = 1365 / 2;
+            graphics.PreferredBackBufferHeight = 765 / 2;
+            metersToPixel = MiniMapLong / FieldConstants.HEIGHT_IN_METERS;
+            //robotOld = new RobotOld(new Vector2(graphics.PreferredBackBufferWidth - (MiniMapWidth / 2f),
+            //    graphics.PreferredBackBufferHeight - (MiniMapHeight / 2f)), metersToPixel);
+
+            robot = new Robot(new Vector3(0, -(FieldConstants.HEIGHT_ABOVE_CARPET / 3) * FieldConstants.C,
+                -(FieldConstants.HEIGHT / 2) * FieldConstants.C),
+                new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2f),
+                graphics.PreferredBackBufferHeight - (MiniMapShort / 2f)), metersToPixel);
+
+            //Set up projection matrice
+            //Viewport viewport = graphics.GraphicsDevice.Viewport;
+            float aspectRatio = 640f / 480f;//(float)viewport.Width / (float)viewport.Height;
+
+            //TODO: learn about it more, what each argument actually means
+            proj = Matrix.CreatePerspectiveFieldOfView(viewAngle / FieldConstants.CAMERA_RATIO, aspectRatio, nearClip, farClip);
         }
 
         /// <summary>
@@ -51,26 +86,34 @@ namespace MiniMap
         {
             base.Initialize();
             RunPythonServer();
+
+            //draw also backed traingles - doesn't help with the 0 z length vision targets
+            RasterizerState state = new RasterizerState();
+            state.CullMode = CullMode.None;
+            GraphicsDevice.RasterizerState = state;
         }
 
         void RunPythonServer()
         {
             string directory = @"C:\try\my_robot.py";
-            byte[] directoryBytes = Encoding.Default.GetBytes(directory);
-            directory = Encoding.UTF8.GetString(directoryBytes);
+            //byte[] directoryBytes = Encoding.Default.GetBytes(directory);
+            //directory = Encoding.UTF8.GetString(directoryBytes);
 
             RunPyScript(directory);
 
+            //client = new RobotClient(robotOld);
             client = new RobotClient(robot);
             client.Start();
         }
 
-        private static void RunPyScript(string scriptName)
+        Process p;
+        private void RunPyScript(string scriptName)
         {
-            Process p = new Process();
+            p = new Process();
             p.StartInfo.FileName = "python.exe";
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.UseShellExecute = false; // make sure we can read the output from stdout
+            p.StartInfo.RedirectStandardOutput = false;
+            p.StartInfo.UseShellExecute = false; ; // make sure we can read the output from stdout
+            p.StartInfo.CreateNoWindow = true;
             p.StartInfo.Arguments = scriptName; // add other parameters if necessary
             p.Start(); // start the process (the python program)
         }
@@ -85,7 +128,12 @@ namespace MiniMap
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             map = Content.Load<Texture2D>("carpet");
-            chassis = Content.Load<Texture2D>("chassis");            
+            chassis = Content.Load<Texture2D>("chassis");
+
+            field = new Field(Content);
+            effect3D = new BasicEffect(GraphicsDevice);
+            effect3D.TextureEnabled = true;
+            effect3D.Projection = proj;
         }
 
         /// <summary>
@@ -95,6 +143,59 @@ namespace MiniMap
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+        }
+
+        void UpdateRobotPosition()
+        {
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            // Allows the game to exit
+            if (keyboardState.IsKeyDown(Keys.Escape))
+            {
+                p.Close();
+                this.Exit();
+                //Environment.Exit(1);
+                return;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Left))
+            {
+                // Rotate left .
+                //angleX += rotationSpeed;
+                robot.Orientation += rotationSpeed;
+            }
+            if (keyboardState.IsKeyDown(Keys.Right))
+            {
+                // Rotate right.
+                //angleX -= rotationSpeed;
+                robot.Orientation -= rotationSpeed;
+            }
+            if (keyboardState.IsKeyDown(Keys.Up))
+            {
+                Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
+                Vector3 v = new Vector3(0, 0, forwardSpeed);
+                v = Vector3.Transform(v, rotation);
+                robot.Position += new Vector3(v.X, 0, v.Z);
+            }
+            if (keyboardState.IsKeyDown(Keys.Down))
+            {
+                Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
+                Vector3 v = new Vector3(0, 0, -forwardSpeed);
+                v = Vector3.Transform(v, rotation);
+                robot.Position += new Vector3(v.X, 0, v.Z);
+            }
+            if (keyboardState.IsKeyDown(Keys.W))
+            {
+                // Rotate Up
+                //angleY -= rotationSpeed;
+                robot.CameraOrientation -= rotationSpeed;
+            }
+            if (keyboardState.IsKeyDown(Keys.S))
+            {
+                // Rotate Down
+                //angleY += rotationSpeed;
+                robot.CameraOrientation += rotationSpeed;
+            }
         }
 
         /// <summary>
@@ -110,12 +211,13 @@ namespace MiniMap
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 this.Exit();
+                p.Close();
                 return;
             }
             else if (keyboardState.IsKeyDown(Keys.F1))
             {
                 client.SetState(RobotState.Teleop);
-            }
+            } 
             else if (keyboardState.IsKeyDown(Keys.F2))
             {
                 client.SetState(RobotState.Auto);
@@ -125,8 +227,10 @@ namespace MiniMap
                 client.SetState(RobotState.Disabled);
             }
 
+            UpdateRobotPosition();
+
+            //robotOld.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            
 
             base.Update(gameTime);
         }
@@ -140,11 +244,15 @@ namespace MiniMap
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            effect3D.View = robot.GetCameraView();
+            field.Draw(GraphicsDevice, effect3D);
+
             spriteBatch.Begin();
-            spriteBatch.Draw(map, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight),
+            spriteBatch.Draw(map, new Rectangle(graphics.PreferredBackBufferWidth - MiniMapLong,
+                graphics.PreferredBackBufferHeight - MiniMapShort, MiniMapLong, MiniMapShort),
                 null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(chassis, robot.Position, null, Color.White, robot.Orientation,
-                new Vector2(50, 25), (metersToPixel) / 100, SpriteEffects.None, 0);
+            //robotOld.DrawRobotOnMap(spriteBatch, chassis);
+            robot.DrawRobotOnMap(spriteBatch, chassis);
             spriteBatch.End();
 
             base.Draw(gameTime);

@@ -5,3 +5,5 @@ Content\visionBlue.xnb
 Content\visionTarget.xnb
 Content\visionRed.xnb
 Content\visionRed0.xnb
+Content\grey.xnb
+Content\earth.xnb

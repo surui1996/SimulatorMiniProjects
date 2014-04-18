@@ -37,3 +37,5 @@ C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\
 C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\obj\x86\Debug\RobotSimulator.exe
 C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\obj\x86\Debug\RobotSimulator.pdb
+C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\bin\x86\Debug\Content\grey.xnb
+C:\Users\דורון\Documents\GitHub\Simulator\RobotSimulator\FirstPersonCamera\bin\x86\Debug\Content\earth.xnb

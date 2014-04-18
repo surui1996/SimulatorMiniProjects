@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using System.IO;
 using System.Net.Sockets;
+using RobotSimulator._3D;
 
 namespace RobotSimulator
 {
@@ -21,25 +22,26 @@ namespace RobotSimulator
         // Content
         BasicEffect effect;
 
-        //MJPEGStreamer streamer;
-        ImageStreamingServer streamingServer;
+        //ImageStreamingServer streamingServer;
 
-        TexturedWall wallRed, wallBlue, carpet3;
-        TexturedWall dynamicRightVision, staticRightVision;
-        //TexturedWall dynamicLeftVision, staticLeftVision;
-        Matrix view;
+        Field field;
+        
+        Cylinder c;
+        Sphere sphere;
+
+        Robot robot;
+
+        //Matrix view;
         Matrix proj;
 
         // Set the camera position and rotation variables.
-        Vector3 cameraPos = new Vector3(-50, -(Field.HEIGHT_ABOVE_CARPET / 3) * Field.C, -500);
-        float angleX, angleY;
+        //Vector3 cameraPos = new Vector3(-50, -(FieldConstants.HEIGHT_ABOVE_CARPET / 3) * FieldConstants.C, -500);
+        //float angleX, angleY;
 
-        // Set the direction the camera points without rotation.
-        Vector3 cameraReference = new Vector3(0, 0, 1);
 
         // Set rates in world units per 1/60th second (the default fixed-step interval).
-        float rotationSpeed = 1f / (10f * Field.C);
-        float forwardSpeed = 50f / (3f * Field.C);
+        float rotationSpeed = 1f / (4f * FieldConstants.C);
+        float forwardSpeed = 50f / (FieldConstants.C);
 
         // Set field of view of the camera in radians (pi/4 is 45 degrees).
         static float viewAngle = MathHelper.ToRadians(45f);
@@ -55,8 +57,9 @@ namespace RobotSimulator
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 320;
-            graphics.PreferredBackBufferHeight = 240;
+            graphics.IsFullScreen = true;
+            //graphics.PreferredBackBufferWidth = 320 *2;
+            //graphics.PreferredBackBufferHeight = 240 * 2;
 
             Content.RootDirectory = "Content";
 
@@ -86,43 +89,31 @@ namespace RobotSimulator
             locker = new object();
 
             //carpet = Content.Load<Texture2D>("carpet");
-            wallRed = new TexturedWall(Field.WIDTH, Field.HEIGHT_ABOVE_CARPET, 0,
-                new Vector3(Field.WIDTH / 2, Field.HEIGHT_ABOVE_CARPET / 2, 0),
-                Content.Load<Texture2D>("visionRed"));
 
-            wallBlue = new TexturedWall(Field.WIDTH, Field.HEIGHT_ABOVE_CARPET, 0,
-                new Vector3(Field.WIDTH / 2, Field.HEIGHT_ABOVE_CARPET / 2, -Field.HEIGHT),
-                Content.Load<Texture2D>("visionBlue"));
+            field = new Field(Content);
 
-            dynamicRightVision = new TexturedWall(Field.DYNAMIC_WIDTH, Field.DYNAMIC_HEIGHT, 0.1f,
-                new Vector3(-Field.WIDTH / 2, -Field.HEIGHT_ABOVE_CARPET / 2, 0) +
-                new Vector3((Field.LOWGOAL_WIDTH + Field.LOWGOAL_WIDTH) / 2, Field.DYNAMIC_HEIGHT_ABOVE_CARPET + Field.DYNAMIC_HEIGHT, 0),
-                Content.Load<Texture2D>("visionTarget"));
+            c = new Cylinder(Content.Load<Texture2D>("grey"), 25, 10,
+                new Vector3(0, 100, -100));
 
-            staticRightVision = new TexturedWall(Field.STATIC_WIDTH, Field.STATIC_HEIGHT, 0.1f,
-                new Vector3(-Field.WIDTH / 2, -Field.HEIGHT_ABOVE_CARPET / 2, 0) +
-                new Vector3(Field.LOWGOAL_WIDTH + Field.STATIC_WIDTH + Field.STATIC_BLACK_STRIPES_WIDTH,
-                    Field.STATIC_HEIGHT_ABOVE_CARPET + Field.STATIC_HEIGHT, 0),
-                Content.Load<Texture2D>("visionTarget"));
+            sphere = new Sphere(Content.Load<Texture2D>("earth"),
+                new Vector3(0, 0, -100), 40.0f, 80);
 
-
-
-            carpet3 = new TexturedWall(Field.WIDTH, 0, Field.HEIGHT,
-                new Vector3(Field.WIDTH / 2, -Field.HEIGHT_ABOVE_CARPET / 2, 0),
-                Content.Load<Texture2D>("carpet"));
+            robot = new Robot(new Vector3(-50, -(FieldConstants.HEIGHT_ABOVE_CARPET / 3) * FieldConstants.C, -500),
+                Vector2.Zero, 0f);
 
             //Set up projection matrice
             Viewport viewport = graphics.GraphicsDevice.Viewport;
             float aspectRatio = 640f / 480f;//(float)viewport.Width / (float)viewport.Height;
 
-            proj = Matrix.CreatePerspectiveFieldOfView(viewAngle / Field.CAMERA_RATIO, aspectRatio, nearClip, farClip);
+            //TODO: learn about it more, what each argument actually means
+            proj = Matrix.CreatePerspectiveFieldOfView(viewAngle / FieldConstants.CAMERA_RATIO, aspectRatio, nearClip, farClip);
 
             effect = new BasicEffect(GraphicsDevice);
+            effect.TextureEnabled = true;
+            effect.Projection = proj;
 
-            //streamer = new MJPEGStreamer();
-            //streamer.Start();
-            streamingServer = new ImageStreamingServer();
-            streamingServer.Start(80);
+            //streamingServer = new ImageStreamingServer();
+            //streamingServer.Start(80);
         }
 
         /// <summary>
@@ -143,13 +134,11 @@ namespace RobotSimulator
         protected override void Update(GameTime gameTime)
         {
             UpdateCameraPosition();
-            UpdateMatrices();
-
             base.Update(gameTime);
         }
 
 
-        int cou = 0;
+        
         /// <summary>
         /// Updates the position and direction of the avatar.
         /// </summary>
@@ -161,71 +150,49 @@ namespace RobotSimulator
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 this.Exit();
+                //Environment.Exit(1);
                 return;
             }
 
             if (keyboardState.IsKeyDown(Keys.Left))
             {
                 // Rotate left .
-                angleX += rotationSpeed;
+                //angleX += rotationSpeed;
+                robot.Orientation += rotationSpeed;
             }
             if (keyboardState.IsKeyDown(Keys.Right))
             {
                 // Rotate right.
-                angleX -= rotationSpeed;
+                //angleX -= rotationSpeed;
+                robot.Orientation -= rotationSpeed;
             }
             if (keyboardState.IsKeyDown(Keys.Up))
             {
-                Matrix rotation = Matrix.CreateRotationY(angleX);
+                Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
                 Vector3 v = new Vector3(0, 0, forwardSpeed);
                 v = Vector3.Transform(v, rotation);
-                cameraPos.Z += v.Z;
-                cameraPos.X += v.X;
+                robot.Position += new Vector3(v.X, 0, v.Z);
             }
             if (keyboardState.IsKeyDown(Keys.Down))
             {
-                Matrix rotation = Matrix.CreateRotationY(angleX);
+                Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
                 Vector3 v = new Vector3(0, 0, -forwardSpeed);
                 v = Vector3.Transform(v, rotation);
-                cameraPos.Z += v.Z;
-                cameraPos.X += v.X;
+                robot.Position += new Vector3(v.X, 0, v.Z);
             }
             if (keyboardState.IsKeyDown(Keys.W))
             {
                 // Rotate Up
-                angleY += rotationSpeed;
+                //angleY -= rotationSpeed;
+                robot.CameraOrientation -= rotationSpeed;
             }
             if (keyboardState.IsKeyDown(Keys.S))
             {
                 // Rotate Down
-                angleY -= rotationSpeed;
-            }
-            if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                // Rotate Down
-                //CopyScreen(cou);
-                cou++;
+                //angleY += rotationSpeed;
+                robot.CameraOrientation += rotationSpeed;
             }
         }
-
-        /// <summary>
-        /// Updates the position and direction of the camera relative to the avatar.
-        /// </summary>
-        void UpdateMatrices()
-        {
-            Matrix rotationMatrix = Matrix.CreateRotationY(angleX) * Matrix.CreateRotationX(angleY);
-
-            // Create a vector pointing the direction the camera is facing.
-            Vector3 transformedReference = Vector3.Transform(cameraReference, rotationMatrix);
-
-            // Calculate the position the camera is looking at.
-            Vector3 cameraLookat = cameraPos + transformedReference;
-
-            // Set up the view matrix and projection matrix.
-            view = Matrix.CreateLookAt(cameraPos, cameraLookat, new Vector3(0.0f, 1.0f, 0.0f));
-        }
-
-
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -233,59 +200,18 @@ namespace RobotSimulator
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            //graphics.GraphicsDevice.Clear(Color.Black);
+            //DrawWithEffect();
+            //base.Draw(gameTime);
+            //NewFrame();
             graphics.GraphicsDevice.Clear(Color.Black);
-            DrawWithEffect();
-            base.Draw(gameTime);
-
-
-            NewFrame();
-
-
-            graphics.GraphicsDevice.Clear(Color.Black);
-            DrawWithEffect();
+            effect.View = robot.GetCameraView();
+            field.Draw(GraphicsDevice, effect);
+            c.Draw(GraphicsDevice, effect);
+            sphere.Draw(GraphicsDevice, effect);
             base.Draw(gameTime);
         }
 
-        private void DrawWithEffect()
-        {
-            effect.TextureEnabled = true;
-            effect.Texture = wallRed.WallTexture;
-            effect.Projection = proj;
-            effect.View = view;
-
-            // apply the effect and render the cube
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                wallRed.Draw(GraphicsDevice);
-            }
-
-            effect.Texture = carpet3.WallTexture;
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                carpet3.Draw(GraphicsDevice);
-            }
-
-            effect.Texture = wallBlue.WallTexture;
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                wallBlue.Draw(GraphicsDevice);
-            }
-
-            effect.Texture = dynamicRightVision.WallTexture;
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                dynamicRightVision.Draw(GraphicsDevice);
-                staticRightVision.Draw(GraphicsDevice);
-            }
-        }
         public static MemoryStream ImageStream;
         public static byte[] ImageBuffer;
         public static bool FrameRecieved;

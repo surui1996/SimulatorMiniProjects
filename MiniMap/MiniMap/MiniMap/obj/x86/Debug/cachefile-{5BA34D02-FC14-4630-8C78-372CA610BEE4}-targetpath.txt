@@ -1,3 +1,6 @@
 Content\carpet.xnb
 Content\chassis.xnb
 Content\arrow.xnb
+Content\visionBlue.xnb
+Content\visionRed.xnb
+Content\carpet3D.xnb

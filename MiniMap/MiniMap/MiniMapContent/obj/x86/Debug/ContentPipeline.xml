@@ -55,6 +55,15 @@
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\carpet3D.xnb</Output>
       <Time>2014-04-18T23:55:51.053454+03:00</Time>
     </Item>
+    <Item>
+      <Source>truss.png</Source>
+      <Name>truss</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\truss.xnb</Output>
+      <Time>2014-04-20T11:28:47.9525448+03:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

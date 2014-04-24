@@ -32,6 +32,11 @@ namespace MiniMap
             clientThread.Start();
         }
 
+        public void Stop()
+        {
+            clientThread.Abort();
+        }
+
         public void SetState(RobotState state)
         {
             client.Send(GetBytes("STATE " + state.ToString().ToUpper()));
@@ -39,6 +44,8 @@ namespace MiniMap
 
         private void ListenToServer()
         {
+            //TODO: set it back
+
             client.Connect("127.0.0.1", 4590);
 
             while (true)

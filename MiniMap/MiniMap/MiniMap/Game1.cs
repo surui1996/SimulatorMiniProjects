@@ -34,10 +34,10 @@ namespace MiniMap
 
         // Set rates in world units per 1/60th second (the default fixed-step interval).
         float rotationSpeed = 1f / (4f * FieldConstants.C);
-        float forwardSpeed = 5f / (FieldConstants.C);
+        float forwardSpeed = 1f / (FieldConstants.C);
 
         // Set field of view of the camera in radians (pi/4 is 45 degrees).
-        static float viewAngle = MathHelper.ToRadians(45f);
+        static float viewAngle = MathHelper.ToRadians(88f);
 
         // Set distance from the camera of the near and far clipping planes.
         static float nearClip = 1.0f;
@@ -67,13 +67,6 @@ namespace MiniMap
                 -(FieldConstants.HEIGHT / 2) * FieldConstants.C),
                 new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2f),
                 graphics.PreferredBackBufferHeight - (MiniMapShort / 2f)), metersToPixel);
-
-            //Set up projection matrice
-            //Viewport viewport = graphics.GraphicsDevice.Viewport;
-            float aspectRatio = 640f / 480f;//(float)viewport.Width / (float)viewport.Height;
-
-            //TODO: learn about it more, what each argument actually means
-            proj = Matrix.CreatePerspectiveFieldOfView(viewAngle / FieldConstants.CAMERA_RATIO, aspectRatio, nearClip, farClip);
         }
 
         /// <summary>
@@ -112,9 +105,9 @@ namespace MiniMap
             p = new Process();
             p.StartInfo.FileName = "python.exe";
             p.StartInfo.RedirectStandardOutput = false;
-            p.StartInfo.UseShellExecute = false; ; // make sure we can read the output from stdout
+            p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.Arguments = scriptName; // add other parameters if necessary
+            p.StartInfo.Arguments = scriptName;
             p.Start(); // start the process (the python program)
         }
 
@@ -131,6 +124,12 @@ namespace MiniMap
             chassis = Content.Load<Texture2D>("chassis");
 
             field = new Field(Content);
+
+            float aspectRatio = GraphicsDevice.Viewport.AspectRatio;// 640/480
+
+            //TODO: learn about it more, what each argument actually means
+            proj = Matrix.CreatePerspectiveFieldOfView(viewAngle / FieldConstants.CAMERA_RATIO, aspectRatio, nearClip, farClip);
+
             effect3D = new BasicEffect(GraphicsDevice);
             effect3D.TextureEnabled = true;
             effect3D.Projection = proj;
@@ -148,15 +147,6 @@ namespace MiniMap
         void UpdateRobotPosition()
         {
             KeyboardState keyboardState = Keyboard.GetState();
-
-            // Allows the game to exit
-            if (keyboardState.IsKeyDown(Keys.Escape))
-            {
-                p.Close();
-                this.Exit();
-                //Environment.Exit(1);
-                return;
-            }
 
             if (keyboardState.IsKeyDown(Keys.Left))
             {
@@ -210,8 +200,9 @@ namespace MiniMap
             // Allows the game to exit
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
+                client.Stop();
+                p.Kill();
                 this.Exit();
-                p.Close();
                 return;
             }
             else if (keyboardState.IsKeyDown(Keys.F1))

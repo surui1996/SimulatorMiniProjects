@@ -7,8 +7,8 @@ class MySimpleRobot(SimpleRobot):
         p = 5 / 90.0
         error = 0.0
         setpoint = 90
-    
-        for i in range(12):
+
+        for i in range(2):
             self.ResetEncoders()
             #self.Wait(0.1)
             self.ArcadeDrive(0.6, 0.0)

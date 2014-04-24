@@ -28,7 +28,11 @@ namespace RobotSimulator
         
         Cylinder c;
         Sphere sphere;
+        //Circle circle;
 
+        Box3 box;
+
+        WheeledBox wheeledBox;
         Robot robot;
 
         //Matrix view;
@@ -44,7 +48,7 @@ namespace RobotSimulator
         float forwardSpeed = 50f / (FieldConstants.C);
 
         // Set field of view of the camera in radians (pi/4 is 45 degrees).
-        static float viewAngle = MathHelper.ToRadians(45f);
+        static float viewAngle = MathHelper.ToRadians(90f);
 
         // Set distance from the camera of the near and far clipping planes.
         static float nearClip = 1.0f;
@@ -57,9 +61,9 @@ namespace RobotSimulator
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.IsFullScreen = true;
-            //graphics.PreferredBackBufferWidth = 320 *2;
-            //graphics.PreferredBackBufferHeight = 240 * 2;
+            //graphics.IsFullScreen = true;
+            graphics.PreferredBackBufferWidth = 320 *2;
+            graphics.PreferredBackBufferHeight = 240 * 2;
 
             Content.RootDirectory = "Content";
 
@@ -92,13 +96,18 @@ namespace RobotSimulator
 
             field = new Field(Content);
 
-            c = new Cylinder(Content.Load<Texture2D>("grey"), 25, 10,
-                new Vector3(0, 100, -100));
+            c = new Cylinder(Content.Load<Texture2D>("grey"), Content.Load<Texture2D>("grey"), 20, 10,
+                new Vector3(0, 20, 200));
 
+            box = new Box3(Content.Load<Texture2D>("grey"), 50, 50, 50, new Vector3(30, 50, 350), 1f);
+            
             sphere = new Sphere(Content.Load<Texture2D>("earth"),
-                new Vector3(0, 0, -100), 40.0f, 80);
+                new Vector3(0, 40, 100), 40.0f, 80);
 
-            robot = new Robot(new Vector3(-50, -(FieldConstants.HEIGHT_ABOVE_CARPET / 3) * FieldConstants.C, -500),
+            wheeledBox = new WheeledBox(Content.Load<Texture2D>("earth"), Content.Load<Texture2D>("grey"), Content.Load<Texture2D>("grey"),
+                2 * FieldConstants.C, 0.8f * FieldConstants.C, 0.25f * FieldConstants.C, Vector3.Zero);
+
+            robot = new Robot(new Vector3(0, 10, 0),
                 Vector2.Zero, 0f);
 
             //Set up projection matrice
@@ -194,21 +203,29 @@ namespace RobotSimulator
             }
         }
 
+        float x = 0;
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            x += 0.01f;
             //graphics.GraphicsDevice.Clear(Color.Black);
             //DrawWithEffect();
             //base.Draw(gameTime);
             //NewFrame();
-            graphics.GraphicsDevice.Clear(Color.Black);
+            graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
             effect.View = robot.GetCameraView();
             field.Draw(GraphicsDevice, effect);
             c.Draw(GraphicsDevice, effect);
             sphere.Draw(GraphicsDevice, effect);
+
+            box.Draw(GraphicsDevice, effect, x);
+
+            wheeledBox.Draw(GraphicsDevice, effect, x);
+            //circle.Draw(GraphicsDevice, effect);
             base.Draw(gameTime);
         }
 

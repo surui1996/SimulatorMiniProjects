@@ -29,7 +29,7 @@ namespace MiniMap
         private float mapMetersToPixel;
         private float vL, vR, velocity, angularVelocity;
 
-        private const float maximumVelocity = 6f; //m/s
+        private const float maximumVelocity = 3f; //m/s
         private const float chassisWidth = 0.5f; //m
 
         //CAMERA STUFF
@@ -75,10 +75,10 @@ namespace MiniMap
                 * Matrix.CreateRotationY(Orientation);
 
             // Create a vector pointing the direction the camera is facing.
-            Vector3 transformedReference = Vector3.Transform(CameraStartingOrientation, rotationMatrix);
+            Vector3 cameraDirection = Vector3.Transform(CameraStartingOrientation, rotationMatrix);
 
             // Calculate the position the camera is looking at.
-            Vector3 cameraLookat = cameraPosition + transformedReference;
+            Vector3 cameraLookat = cameraPosition + cameraDirection;
 
             // Set up the view matrix and projection matrix.
             return Matrix.CreateLookAt(cameraPosition, cameraLookat, Vector3.Up);

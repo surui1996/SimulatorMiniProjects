@@ -110,10 +110,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animation3D\Box3D.cs" />
+    <Compile Include="Animation3D\Box.cs" />
+    <Compile Include="Animation3D\Circle.cs" />
+    <Compile Include="Animation3D\Cylinder.cs" />
     <Compile Include="Animation3D\Field.cs" />
     <Compile Include="Animation3D\FieldConstants.cs" />
-    <Compile Include="Animation3D\TexturedWall.cs" />
+    <Compile Include="Animation3D\GameBall.cs" />
+    <Compile Include="Animation3D\HollowCylinder.cs" />
+    <Compile Include="Animation3D\Sphere.cs" />
+    <Compile Include="Animation3D\WheeledBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />

@@ -25,7 +25,7 @@ namespace RobotSimulator
         //ImageStreamingServer streamingServer;
 
         Field field;
-        
+
         Cylinder c;
         Sphere sphere;
         //Circle circle;
@@ -62,7 +62,7 @@ namespace RobotSimulator
         {
             graphics = new GraphicsDeviceManager(this);
             //graphics.IsFullScreen = true;
-            graphics.PreferredBackBufferWidth = 320 *2;
+            graphics.PreferredBackBufferWidth = 320 * 2;
             graphics.PreferredBackBufferHeight = 240 * 2;
 
             Content.RootDirectory = "Content";
@@ -84,6 +84,8 @@ namespace RobotSimulator
             GraphicsDevice.RasterizerState = state;
         }
 
+        Vector3 cameraPosition1, cameraPosition2, cameraPosition3;
+
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
@@ -100,12 +102,13 @@ namespace RobotSimulator
                 new Vector3(0, 20, 200));
 
             box = new Box3(Content.Load<Texture2D>("grey"), 50, 50, 50, new Vector3(30, 50, 350), 1f);
-            
+
             sphere = new Sphere(Content.Load<Texture2D>("earth"),
-                new Vector3(0, 40, 100), 40.0f, 80);
+                new Vector3(0, 40, 100), 20.0f, 80);
 
             wheeledBox = new WheeledBox(Content.Load<Texture2D>("earth"), Content.Load<Texture2D>("grey"), Content.Load<Texture2D>("grey"),
-                2 * FieldConstants.C, 0.8f * FieldConstants.C, 0.25f * FieldConstants.C, Vector3.Zero);
+                2 * FieldConstants.C, 0.8f * FieldConstants.C, 0.25f * FieldConstants.C,
+                new Vector3(0, 0, 50));
 
             robot = new Robot(new Vector3(0, 10, 0),
                 Vector2.Zero, 0f);
@@ -120,6 +123,12 @@ namespace RobotSimulator
             effect = new BasicEffect(GraphicsDevice);
             effect.TextureEnabled = true;
             effect.Projection = proj;
+
+            cameraPosition1 = FieldConstants.C * new Vector3(-FieldConstants.WIDTH * 1.2f, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 2);
+            cameraPosition2 = FieldConstants.C * new Vector3(0, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT);
+            cameraPosition3 = FieldConstants.C * new Vector3(FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0);
+            effect.View = Matrix.CreateLookAt(cameraPosition1,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
 
             //streamingServer = new ImageStreamingServer();
             //streamingServer.Start(80);
@@ -146,8 +155,8 @@ namespace RobotSimulator
             base.Update(gameTime);
         }
 
+        float d = 0;
 
-        
         /// <summary>
         /// Updates the position and direction of the avatar.
         /// </summary>
@@ -163,6 +172,28 @@ namespace RobotSimulator
                 return;
             }
 
+            if (keyboardState.IsKeyDown(Keys.D1))
+            {
+                effect.View = Matrix.CreateLookAt(cameraPosition1,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
+            }
+            if (keyboardState.IsKeyDown(Keys.D2))
+            {
+                effect.View = Matrix.CreateLookAt(cameraPosition2,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
+            }
+            if (keyboardState.IsKeyDown(Keys.D3))
+            {
+                effect.View = Matrix.CreateLookAt(cameraPosition3,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
+            }
+            if (keyboardState.IsKeyDown(Keys.D4))
+            {
+                effect.View = robot.GetCameraView();
+            }
+
+                
+
             if (keyboardState.IsKeyDown(Keys.Left))
             {
                 // Rotate left .
@@ -177,6 +208,7 @@ namespace RobotSimulator
             }
             if (keyboardState.IsKeyDown(Keys.Up))
             {
+                d += 3;
                 Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
                 Vector3 v = new Vector3(0, 0, forwardSpeed);
                 v = Vector3.Transform(v, rotation);
@@ -184,6 +216,7 @@ namespace RobotSimulator
             }
             if (keyboardState.IsKeyDown(Keys.Down))
             {
+                d -= 3;
                 Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
                 Vector3 v = new Vector3(0, 0, -forwardSpeed);
                 v = Vector3.Transform(v, rotation);
@@ -217,14 +250,17 @@ namespace RobotSimulator
             //base.Draw(gameTime);
             //NewFrame();
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-            effect.View = robot.GetCameraView();
+            
             field.Draw(GraphicsDevice, effect);
-            c.Draw(GraphicsDevice, effect);
+            c.Draw(GraphicsDevice, effect, x);
             sphere.Draw(GraphicsDevice, effect);
 
-            box.Draw(GraphicsDevice, effect, x);
+            //box.Draw(GraphicsDevice, effect, x);
 
+            Matrix oldWorld = effect.World;
+            effect.World = Matrix.CreateTranslation(Vector3.UnitZ * d) * effect.World; 
             wheeledBox.Draw(GraphicsDevice, effect, x);
+            effect.World = oldWorld;
             //circle.Draw(GraphicsDevice, effect);
             base.Draw(gameTime);
         }

@@ -13,8 +13,7 @@ namespace MiniMap
     class RobotClient
     {
         Thread clientThread;
-        Socket client;
-        //RobotOld robot;      
+        Socket client;    
         Robot robot;      
 
         public RobotClient(Robot robot)
@@ -44,8 +43,6 @@ namespace MiniMap
 
         private void ListenToServer()
         {
-            //TODO: set it back
-
             client.Connect("127.0.0.1", 4590);
 
             while (true)

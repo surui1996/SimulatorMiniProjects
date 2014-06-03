@@ -8,71 +8,42 @@ using Microsoft.Xna.Framework.Content;
 
 namespace MiniMap.Animation3D
 {
+
     class Field
     {
-        TexturedWall wallRed, wallBlue, carpet3;
+        Box wallRed, wallBlue, carpet3, boundryLeft, boundryRight;
         //TexturedWall dynamicRightVision, staticRightVision;
 
         public Field(ContentManager content)
         {
-            wallRed = new TexturedWall(FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0,
-               new Vector3(FieldConstants.WIDTH / 2, FieldConstants.HEIGHT_ABOVE_CARPET / 2, 0),
-               content.Load<Texture2D>("visionRed"));
+            wallRed = new Box(content.Load<Texture2D>("visionRed"), FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0,
+               new Vector3(0, 0, FieldConstants.HEIGHT), FieldConstants.C);
 
-            wallBlue = new TexturedWall(FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0,
-                new Vector3(FieldConstants.WIDTH / 2, FieldConstants.HEIGHT_ABOVE_CARPET / 2, -FieldConstants.HEIGHT),
-                content.Load<Texture2D>("visionBlue"));
+            wallBlue = new Box(content.Load<Texture2D>("visionBlue"), FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0,
+                Vector3.Zero, FieldConstants.C);
 
-            //dynamicRightVision = new TexturedWall(FieldConstants.DYNAMIC_WIDTH, FieldConstants.DYNAMIC_HEIGHT, 0.1f,
-            //    new Vector3(-FieldConstants.WIDTH / 2, -FieldConstants.HEIGHT_ABOVE_CARPET / 2, 0) +
-            //    new Vector3((FieldConstants.LOWGOAL_WIDTH + FieldConstants.LOWGOAL_WIDTH) / 2, FieldConstants.DYNAMIC_HEIGHT_ABOVE_CARPET + FieldConstants.DYNAMIC_HEIGHT, 0),
-            //    content.Load<Texture2D>("visionTarget"));
+            boundryRight = new Box(content.Load<Texture2D>("boundryGrey"), FieldConstants.WIDTH / 50,
+                FieldConstants.HEIGHT_ABOVE_CARPET / 10, FieldConstants.HEIGHT,
+                -Vector3.UnitX * FieldConstants.WIDTH / 50, FieldConstants.C);
 
-            //staticRightVision = new TexturedWall(FieldConstants.STATIC_WIDTH, FieldConstants.STATIC_HEIGHT, 0.1f,
-            //    new Vector3(-FieldConstants.WIDTH / 2, -FieldConstants.HEIGHT_ABOVE_CARPET / 2, 0) +
-            //    new Vector3(FieldConstants.LOWGOAL_WIDTH + FieldConstants.STATIC_WIDTH + FieldConstants.STATIC_BLACK_STRIPES_WIDTH,
-            //        FieldConstants.STATIC_HEIGHT_ABOVE_CARPET + FieldConstants.STATIC_HEIGHT, 0),
-            //    content.Load<Texture2D>("visionTarget"));
+            boundryLeft = new Box(content.Load<Texture2D>("boundryGrey"), FieldConstants.WIDTH / 50,
+               FieldConstants.HEIGHT_ABOVE_CARPET / 10, FieldConstants.HEIGHT,
+               Vector3.UnitX * FieldConstants.WIDTH, FieldConstants.C);
 
-            carpet3 = new TexturedWall(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT,
-                new Vector3(FieldConstants.WIDTH / 2, -FieldConstants.HEIGHT_ABOVE_CARPET / 2, 0),
-                content.Load<Texture2D>("carpet3D"));
+            carpet3 = new Box(content.Load<Texture2D>("carpet3D"), FieldConstants.WIDTH, 2 / FieldConstants.C, FieldConstants.HEIGHT,
+                Vector3.Zero, FieldConstants.C);
+
+            
         }
 
         public void Draw(GraphicsDevice graphicsDevice, BasicEffect effect)
         {
-            effect.Texture = wallRed.WallTexture;
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                wallRed.Draw(graphicsDevice);
-            }
-
-            effect.Texture = carpet3.WallTexture;
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                carpet3.Draw(graphicsDevice);
-            }
-
-            effect.Texture = wallBlue.WallTexture;
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                wallBlue.Draw(graphicsDevice);
-            }
-
-            //effect.Texture = dynamicRightVision.WallTexture;
-            //foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            //{
-            //    pass.Apply();
-
-            //    dynamicRightVision.Draw(graphicsDevice);
-            //    staticRightVision.Draw(graphicsDevice);
-            //}
+            wallRed.Draw(graphicsDevice, effect);
+            wallBlue.Draw(graphicsDevice, effect);
+            boundryRight.Draw(graphicsDevice, effect);
+            boundryLeft.Draw(graphicsDevice, effect);
+            carpet3.Draw(graphicsDevice, effect);
         }
+
     }
 }

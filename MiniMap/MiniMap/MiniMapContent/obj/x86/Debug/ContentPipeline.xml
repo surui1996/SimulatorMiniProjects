@@ -17,16 +17,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\chassis.xnb</Output>
-      <Time>2014-04-13T13:23:28.636293+03:00</Time>
-    </Item>
-    <Item>
-      <Source>arrow.png</Source>
-      <Name>arrow</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\arrow.xnb</Output>
-      <Time>2014-04-13T15:30:49.3863253+03:00</Time>
+      <Time>2014-04-27T14:07:37.1685989+03:00</Time>
     </Item>
     <Item>
       <Source>visionBlue.png</Source>
@@ -53,7 +44,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\carpet3D.xnb</Output>
-      <Time>2014-04-18T23:55:51.053454+03:00</Time>
+      <Time>2014-04-25T15:34:52.2027739+03:00</Time>
     </Item>
     <Item>
       <Source>truss.png</Source>
@@ -63,6 +54,60 @@
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\truss.xnb</Output>
       <Time>2014-04-20T11:28:47.9525448+03:00</Time>
+    </Item>
+    <Item>
+      <Source>innerWheel.png</Source>
+      <Name>innerWheel</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\innerWheel.xnb</Output>
+      <Time>2014-04-25T14:16:13.2402098+03:00</Time>
+    </Item>
+    <Item>
+      <Source>plaction.jpg</Source>
+      <Name>plaction</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\plaction.xnb</Output>
+      <Time>2014-04-25T14:16:13.2422117+03:00</Time>
+    </Item>
+    <Item>
+      <Source>greenBox.png</Source>
+      <Name>greenBox</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\greenBox.xnb</Output>
+      <Time>2014-04-25T14:18:20.532869+03:00</Time>
+    </Item>
+    <Item>
+      <Source>boundryGrey.png</Source>
+      <Name>boundryGrey</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\boundryGrey.xnb</Output>
+      <Time>2014-04-26T16:04:06.0803456+03:00</Time>
+    </Item>
+    <Item>
+      <Source>sphereLogo.png</Source>
+      <Name>sphereLogo</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\sphereLogo.xnb</Output>
+      <Time>2014-06-03T12:28:04.022499+03:00</Time>
+    </Item>
+    <Item>
+      <Source>greenBall.png</Source>
+      <Name>greenBall</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\greenBall.xnb</Output>
+      <Time>2014-06-03T12:33:04.7504822+03:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

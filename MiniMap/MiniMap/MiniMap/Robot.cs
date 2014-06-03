@@ -23,21 +23,32 @@ namespace MiniMap
         public float Orientation { get; set; }
         public float CameraOrientation { get; set; }
 
+        //in map-pixels coordinate system
+        private Vector2 cornerFrontLeft;
+        private Vector2 cornerFrontRight;
+        private Vector2 cornerRearLeft;
+        private Vector2 cornerRearRight;
+        
         private Vector2 initialPositionOnMap;
         private Vector3 initialPositionOn3D;
 
         private float mapMetersToPixel;
-        private float vL, vR, velocity, angularVelocity;
+        //private float vL, vR, velocity, angularVelocity;
 
-        private const float maximumVelocity = 3f; //m/s
-        private const float chassisWidth = 0.5f; //m
+        private const float MAXIMUM_VELOCITY = 3f; //m/s
+        private const float CHASSIS_WIDTH = 0.5f; //m
+        private const float CHASSIS_LENGTH = CHASSIS_WIDTH * 2; //m
+        private const float WHEEL_RADIUS = 0.15f; //m
+
+        private WheeledBox wheeledBox;
 
         //CAMERA STUFF
         //TODO: make it half the size of the robot
         private static Vector3 CameraRelativePosition = Vector3.Zero;
         private static Vector3 CameraStartingOrientation = new Vector3(0, 0, 1);
 
-        public Robot(Vector3 position3D, Vector2 mapPosition, float mapMetersToPixel)
+        public Robot(Vector3 position3D, Vector2 mapPosition, float mapMetersToPixel,
+            Texture2D body, Texture2D wheelSide, Texture2D wheelCircumference)
         {
             this.initialPositionOn3D = position3D;
             this.initialPositionOnMap = mapPosition;
@@ -52,24 +63,55 @@ namespace MiniMap
 
             Orientation = MathHelper.ToRadians(0);
             CameraOrientation = MathHelper.ToRadians(0);
+            CameraRelativePosition = Vector3.UnitY * FieldConstants.HEIGHT_ABOVE_CARPET / 3 * FieldConstants.C;
+
+            float c = FieldConstants.PIXELS_IN_ONE_METER;
+            wheeledBox = new WheeledBox(body, wheelSide, wheelCircumference, CHASSIS_LENGTH * c,
+                CHASSIS_WIDTH * c, WHEEL_RADIUS * c);
         }
 
         public void Update(float dt) //dt = timeSinceLastUpdate
         {
-            //MapPosition += velocity * new Vector2((float)Math.Cos(Orientation),
-            //        (float)Math.Sin(Orientation)) * dt * mapMetersToPixel;
+            float vL = LeftOutput * MAXIMUM_VELOCITY;
+            if (velocityLeftZero)
+                vL = 0;
+
+            float vR = RightOutput * MAXIMUM_VELOCITY;
+            if (velocityRightZero)
+                vR = 0;
+
+            float velocity = (vR + vL) / 2;
+            float angularVelocity = (vR - vL) / CHASSIS_WIDTH;
+
+            if (velocityLeftZero || velocityRightZero)
+                angularVelocity *= 2;
+
             Position += velocity * new Vector3((float)Math.Sin(Orientation), 0,
                 (float)Math.Cos(Orientation)) * dt;//;//mapMetersToPixel;
-            Orientation += -angularVelocity * dt;
+            Orientation += angularVelocity * dt;
+
+            //in map-pixels coordinate system
+            Vector3 mapVector = Position * mapMetersToPixel;
+            Vector2 pos = new Vector2(mapVector.Z, -mapVector.X);            
+            cornerFrontLeft = pos + Vector2.Transform(new Vector2(CHASSIS_LENGTH / 2, -CHASSIS_WIDTH / 2) * mapMetersToPixel,
+                Matrix.CreateRotationZ(-Orientation));
+            cornerRearLeft = pos + Vector2.Transform(new Vector2(-CHASSIS_LENGTH / 2, -CHASSIS_WIDTH / 2) * mapMetersToPixel,
+                Matrix.CreateRotationZ(-Orientation));
+            cornerFrontRight = pos + Vector2.Transform(new Vector2(CHASSIS_LENGTH / 2, CHASSIS_WIDTH / 2) * mapMetersToPixel,
+                Matrix.CreateRotationZ(-Orientation));
+            cornerRearRight = pos + Vector2.Transform(new Vector2(-CHASSIS_LENGTH / 2, CHASSIS_WIDTH / 2) * mapMetersToPixel,
+                Matrix.CreateRotationZ(-Orientation));
 
             GyroAngle += MathHelper.ToDegrees(angularVelocity * dt);
             EncoderLeft += vL * dt;
             EncoderRight += vR * dt;
+
+            CheckIntersectionWithField();
         }
 
         public Matrix GetCameraView()
         {
-            Vector3 cameraPosition = Position * (FieldConstants.C / FieldConstants.FOOT_IN_METERS) + initialPositionOn3D + CameraRelativePosition;
+            Vector3 cameraPosition = Position * FieldConstants.PIXELS_IN_ONE_METER + initialPositionOn3D + CameraRelativePosition;
 
             Matrix rotationMatrix = Matrix.CreateRotationX(CameraOrientation)
                 * Matrix.CreateRotationY(Orientation);
@@ -150,25 +192,64 @@ namespace MiniMap
         {
             LeftOutput = left;
             RightOutput = right;
-
-            vR = right * maximumVelocity;
-            vL = left * maximumVelocity;
-            velocity = (vR + vL) / 2;
-            angularVelocity = (vR - vL) / chassisWidth;
         }
 
         public void DrawRobotOnMap(SpriteBatch spriteBatch, Texture2D chassisTexture)
         {
             Vector3 mapVector = Position * mapMetersToPixel;
-            spriteBatch.Draw(chassisTexture, new Vector2(mapVector.Z, mapVector.X) + initialPositionOnMap,
-                null, Color.White, this.Orientation, new Vector2(50, 25), (mapMetersToPixel) / 100,
+            spriteBatch.Draw(chassisTexture, new Vector2(mapVector.Z, -mapVector.X) + initialPositionOnMap,
+                null, Color.White, -this.Orientation, new Vector2(50, 25), (mapMetersToPixel) / 100,
                 SpriteEffects.None, 0);
+            //spriteBatch.Draw(chassisTexture, cornerFrontLeft + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
+            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
+            //spriteBatch.Draw(chassisTexture, cornerFrontRight + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
+            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
+            //spriteBatch.Draw(chassisTexture, cornerRearLeft + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
+            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
+            //spriteBatch.Draw(chassisTexture, cornerRearRight + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
+            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
         }
 
-        //TODO: when we have robot animation...
-        public void DrawRobot()
+        public void DrawRobot(GraphicsDevice device, BasicEffect effect)
         {
+            Matrix oldWorld = effect.World;
+            effect.World = Matrix.CreateTranslation(initialPositionOn3D + Position * FieldConstants.PIXELS_IN_ONE_METER) * effect.World;
+            wheeledBox.Draw(device, effect, Orientation);
+            effect.World = oldWorld;
+        }
 
+        private bool velocityRightZero, velocityLeftZero;
+
+        private void CheckIntersectionWithField()
+        {
+            velocityLeftZero = false;
+            velocityRightZero = false;
+            CheckIntersectionWithXLine(-FieldConstants.HEIGHT_IN_METERS / 2 * mapMetersToPixel, true);
+            CheckIntersectionWithXLine(FieldConstants.HEIGHT_IN_METERS / 2 * mapMetersToPixel, false);
+            CheckIntersectionWithYLine(-FieldConstants.WIDTH_IN_METERS / 2 * mapMetersToPixel, true);
+            CheckIntersectionWithYLine(FieldConstants.WIDTH_IN_METERS / 2 * mapMetersToPixel, false);
+        }
+
+        private void CheckIntersectionWithXLine(float x, bool robotPosGreaterThanX)
+        {
+            int d = robotPosGreaterThanX ? 1 : -1;
+
+            if ((cornerFrontLeft.X * d < x * d && LeftOutput > 0) || (cornerRearLeft.X * d < x * d && LeftOutput < 0))
+                velocityLeftZero = true;
+
+            if ((cornerFrontRight.X * d < x * d && RightOutput > 0) || (cornerRearRight.X * d < x * d && RightOutput < 0))
+                velocityRightZero = true;
+        }
+
+        private void CheckIntersectionWithYLine(float y, bool robotPosGreaterThanY)
+        {
+            int d = robotPosGreaterThanY ? 1 : -1;
+
+            if ((cornerFrontLeft.Y * d < y * d && LeftOutput > 0) || (cornerRearLeft.Y * d < y * d && LeftOutput < 0))
+                velocityLeftZero = true;
+
+            if ((cornerFrontRight.Y * d < y * d && RightOutput > 0) || (cornerRearRight.Y * d < y * d && RightOutput < 0))
+                velocityRightZero = true;
         }
 
     }

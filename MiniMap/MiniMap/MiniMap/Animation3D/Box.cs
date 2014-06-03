@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MiniMap.Animation3D
 {
-    enum Plane
-    {
-        Top = 0, Bottom = 1, Right = 2, Left = 3, Front = 4, Back = 5
-    }
-    class Box3D
+    class Box
     {
 
         protected static int NUM_TRIANGLES = 12;
@@ -19,88 +15,39 @@ namespace MiniMap.Animation3D
 
         // Array of vertex information - contains position, normal and texture data
         protected VertexPositionNormalTexture[] vertices;
-        protected bool isConstructed;
 
-        protected Vector3 topLeftFront, topLeftBack, topRightFront, topRightBack;
-        protected Vector3 btmLeftFront, btmLeftBack, btmRightFront, btmRightBack;
+        private Vector3 topLeftFront, topLeftBack, topRightFront, topRightBack;
+        private Vector3 btmLeftFront, btmLeftBack, btmRightFront, btmRightBack;
 
         public Vector3 Position { get; set; }
+        public Texture2D Texture { get; set; }
 
+        private float x, y, z;
 
-        public Box3D(float x, float y, float z, Vector3 position)
+        public Box(Texture2D texture, float x, float y, float z, Vector3 position, float scale)
         {
-            x = -x * FieldConstants.C;
-            y = -y * FieldConstants.C;
-            z = -z * FieldConstants.C;
-            position = position * FieldConstants.C;
-            //position -= new Vector3((int)((float)x / 2), (int)((float)y / 2), 0); 
+            Texture = texture;
+            
+            Position = position * scale;
+            x = x * scale;
+            y = y * scale;
+            z = z * scale;
 
-            topLeftFront = position;
-            topLeftBack = new Vector3(0, 0, z) + position;
-            topRightFront = new Vector3(x, 0, 0) + position;
-            topRightBack = new Vector3(x, 0, z) + position;
-            btmLeftFront = new Vector3(0, y, 0) + position;
-            btmLeftBack = new Vector3(0, y, z) + position;
-            btmRightFront = new Vector3(x, y, 0) + position;
-            btmRightBack = new Vector3(x, y, z) + position;
-            Position = position;
-        }
+            this.x = x; this.y = y; this.z = z;
 
-        public Box3D(Vector3[] vertices, Vector3 position)
-        {
-            topLeftFront = vertices[0] + position;
-            topLeftBack = vertices[1] + position;
-            topRightFront = vertices[2] + position;
-            topRightBack = vertices[3] + position;
-            btmLeftFront = vertices[4] + position;
-            btmLeftBack = vertices[5] + position;
-            btmRightFront = vertices[6] + position;
-            btmRightBack = vertices[7] + position;
-            Position = position;
-        }
+            //somewhat strange axis system
 
-        public static Vector3 Normal(int plane)
-        {
-            // Normal vectors for each face (needed for lighting / display)
-            switch (plane)
-            {
-                case 0://Planes.Top:
-                    return new Vector3(0.0f, 1.0f, 0.0f);
-                case 1://Planes.Bottom:
-                    return new Vector3(0.0f, -1.0f, 0.0f);
-                case 2://Planes.Right:
-                    return new Vector3(1.0f, 0.0f, 0.0f);
-                case 3://Planes.Left:
-                    return new Vector3(-1.0f, 0.0f, 0.0f);
-                case 4://Planes.Front:
-                    return new Vector3(0.0f, 0.0f, 1.0f);
-                case 5://Planes.Back:
-                    return new Vector3(0.0f, 0.0f, -1.0f);
-            }
-            return Vector3.Zero;
-        }
+            btmRightFront = new Vector3(0, 0, z);
+            btmRightBack = new Vector3(0, 0, 0);
+            btmLeftFront = new Vector3(x, 0, z);
+            btmLeftBack = new Vector3(x, 0, 0);
 
-        public void Draw(GraphicsDevice device)
-        {
-            // Build the cube, setting up the _vertices array
-            if (isConstructed == false)
-                Construct();
-
-            // Create the shape buffer and dispose of it to prevent out of memory
-            using (VertexBuffer buffer = new VertexBuffer(
-                device,
-                VertexPositionNormalTexture.VertexDeclaration,
-                vertices.Length,
-                BufferUsage.WriteOnly))
-            {
-                // Load the buffer
-                buffer.SetData(vertices);
-
-                // Send the vertex buffer to the device
-                device.SetVertexBuffer(buffer);
-            }
-
-            device.DrawPrimitives(PrimitiveType.TriangleList, 0, NUM_TRIANGLES);
+            topRightFront = new Vector3(0, y, z);
+            topRightBack = new Vector3(0, y, 0);
+            topLeftFront = new Vector3(x, y, z);
+            topLeftBack = new Vector3(x, y, 0);
+            
+            Construct();
         }
 
         protected virtual void Construct()
@@ -110,12 +57,12 @@ namespace MiniMap.Animation3D
             vertices = new VertexPositionNormalTexture[NUM_VERTICES];
 
             // Normal vectors for each face (needed for lighting / display)
-            Vector3 normalFront = Normal((int)Plane.Front);
-            Vector3 normalBack = Normal((int)Plane.Back);
-            Vector3 normalTop = Normal((int)Plane.Top);
-            Vector3 normalBottom = Normal((int)Plane.Bottom);
-            Vector3 normalLeft = Normal((int)Plane.Left);
-            Vector3 normalRight = Normal((int)Plane.Right);
+            Vector3 normalFront = Vector3.Forward;// Normal((int)Plane.Front);
+            Vector3 normalBack = Vector3.Backward; //Normal((int)Plane.Back);
+            Vector3 normalTop = Vector3.Up;//Normal((int)Plane.Top);
+            Vector3 normalBottom = Vector3.Down;//Normal((int)Plane.Bottom);
+            Vector3 normalLeft = Vector3.Left;//Normal((int)Plane.Left);
+            Vector3 normalRight = Vector3.Right;//Normal((int)Plane.Right);
 
             // UV texture coordinates
             Vector2 textureTopLeft = new Vector2(1.0f, 0.0f);
@@ -170,9 +117,33 @@ namespace MiniMap.Animation3D
             vertices[33] = new VertexPositionNormalTexture(topRightBack, normalRight, textureTopRight);
             vertices[34] = new VertexPositionNormalTexture(topRightFront, normalRight, textureTopLeft);
             vertices[35] = new VertexPositionNormalTexture(btmRightBack, normalRight, textureBottomRight);
-
-            isConstructed = true;
         }
 
+        public void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)
+        {
+            Matrix oldWorld = effect.World;
+            Texture2D oldTexture = effect.Texture;
+
+            effect.World = Matrix.CreateTranslation(-0.5f * topLeftFront) * Matrix.CreateRotationY(angleY) *
+                Matrix.CreateTranslation(Position) * Matrix.CreateTranslation(0.5f * topLeftFront)
+                * effect.World;
+
+            if (Texture != null)
+            {
+                effect.Texture = Texture;
+            }
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                device.DrawUserPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList,
+                    vertices, 0, NUM_TRIANGLES);
+            }
+
+            effect.World = oldWorld;
+            effect.Texture = oldTexture;
+        }   
+
+
+        
     }
 }

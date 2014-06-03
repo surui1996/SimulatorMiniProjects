@@ -1,13 +1,14 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
-namespace RobotSimulator._3D
+namespace MiniMap.Animation3D
 {
     class Sphere
-    {
-        // the textures used for mid- and high-latitudes
+    {// the textures used for mid- and high-latitudes
         public Texture2D Texture { get; set; }
 
         // sphere vertices
@@ -108,7 +109,6 @@ namespace RobotSimulator._3D
             }
         }
 
-        float x = 0;
         /// <summary>
         /// Draws this globe on the given device using the given effect.
         /// </summary>
@@ -116,14 +116,12 @@ namespace RobotSimulator._3D
         /// <param name="effect">The effect to draw with</param>
         public void Draw(GraphicsDevice device, BasicEffect effect)
         {
-            x += 0.05f;
             Matrix oldWorld = effect.World;
             Texture2D oldTexture = effect.Texture;
 
             // tranfrom coordinate system to match radius of this shpere
             //rotate it with some angular velocity
-            effect.World = Matrix.CreateRotationY(x) *
-                Matrix.CreateTranslation(Position) * oldWorld;
+            effect.World = Matrix.CreateTranslation(Position) * oldWorld;
 
             // draw the sphere
             if (Texture != null)
@@ -138,7 +136,7 @@ namespace RobotSimulator._3D
                     (PrimitiveType.TriangleList, sphere, 0, sphere.Length, sphereIndices.ToArray(),
                     0, sphereIndices.Count / 3);
             }
-            
+
             // restore old effect state
             effect.Texture = oldTexture;
             effect.World = oldWorld;

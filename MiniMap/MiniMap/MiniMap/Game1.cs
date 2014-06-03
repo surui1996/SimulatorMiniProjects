@@ -23,13 +23,13 @@ namespace MiniMap
         SpriteBatch spriteBatch;
 
         Texture2D map, chassis;
-        //RobotOld robotOld;
         RobotClient client;
 
         // Content
         BasicEffect effect3D;
         Field field;
         Robot robot;
+        GameBall ball;
         Matrix proj;
 
         // Set rates in world units per 1/60th second (the default fixed-step interval).
@@ -37,12 +37,11 @@ namespace MiniMap
         float forwardSpeed = 1f / (FieldConstants.C);
 
         // Set field of view of the camera in radians (pi/4 is 45 degrees).
-        static float viewAngle = MathHelper.ToRadians(88f);
+        static float viewAngle = MathHelper.PiOver4;
 
         // Set distance from the camera of the near and far clipping planes.
-        static float nearClip = 1.0f;
-        static float farClip = 10000.0f;
-
+        static float nearClip = 10.0f;
+        static float farClip = 1000.0f;
 
         private const int MiniMapLong = 741 / 4;
         private const int MiniMapShort = 335 / 4;
@@ -50,6 +49,9 @@ namespace MiniMap
         public static KeyboardState keyboardState;
 
         float metersToPixel;
+
+        Vector3 cameraPosition1, cameraPosition2, cameraPosition3, cameraPosition4;
+        bool movingCamera = true;
 
         public Game1()
         {
@@ -63,10 +65,11 @@ namespace MiniMap
             //robotOld = new RobotOld(new Vector2(graphics.PreferredBackBufferWidth - (MiniMapWidth / 2f),
             //    graphics.PreferredBackBufferHeight - (MiniMapHeight / 2f)), metersToPixel);
 
-            robot = new Robot(new Vector3(0, -(FieldConstants.HEIGHT_ABOVE_CARPET / 3) * FieldConstants.C,
-                -(FieldConstants.HEIGHT / 2) * FieldConstants.C),
-                new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2f),
-                graphics.PreferredBackBufferHeight - (MiniMapShort / 2f)), metersToPixel);
+            cameraPosition1 = FieldConstants.C * new Vector3(-FieldConstants.WIDTH * 1.2f, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 2);
+            cameraPosition4 = FieldConstants.C * new Vector3(FieldConstants.WIDTH * 0.500001f, FieldConstants.HEIGHT * 0.93f, FieldConstants.HEIGHT / 2);
+            cameraPosition2 = FieldConstants.C * new Vector3(0, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT);
+            cameraPosition3 = FieldConstants.C * new Vector3(FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0);
+            
         }
 
         /// <summary>
@@ -79,11 +82,6 @@ namespace MiniMap
         {
             base.Initialize();
             RunPythonServer();
-
-            //draw also backed traingles - doesn't help with the 0 z length vision targets
-            RasterizerState state = new RasterizerState();
-            state.CullMode = CullMode.None;
-            GraphicsDevice.RasterizerState = state;
         }
 
         void RunPythonServer()
@@ -122,12 +120,24 @@ namespace MiniMap
 
             map = Content.Load<Texture2D>("carpet");
             chassis = Content.Load<Texture2D>("chassis");
+            robot = new Robot(FieldConstants.C * new Vector3(FieldConstants.WIDTH / 2,
+                0, FieldConstants.HEIGHT / 2),
+                new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2f),
+                graphics.PreferredBackBufferHeight - (MiniMapShort / 2f)), metersToPixel,
+                 Content.Load<Texture2D>("greenBox"),
+                 Content.Load<Texture2D>("innerWheel"),
+                 Content.Load<Texture2D>("plaction"));
+
+            ball = new GameBall(FieldConstants.C * new Vector3(FieldConstants.WIDTH / 4,
+                0, FieldConstants.HEIGHT / 2),
+                new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2),
+                graphics.PreferredBackBufferHeight - (MiniMapShort / 4)), metersToPixel,
+                Content.Load<Texture2D>("greenBall"), Content.Load<Texture2D>("sphereLogo"));
 
             field = new Field(Content);
 
             float aspectRatio = GraphicsDevice.Viewport.AspectRatio;// 640/480
 
-            //TODO: learn about it more, what each argument actually means
             proj = Matrix.CreatePerspectiveFieldOfView(viewAngle / FieldConstants.CAMERA_RATIO, aspectRatio, nearClip, farClip);
 
             effect3D = new BasicEffect(GraphicsDevice);
@@ -196,7 +206,7 @@ namespace MiniMap
         protected override void Update(GameTime gameTime)
         {
             keyboardState = Keyboard.GetState();
-            
+
             // Allows the game to exit
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
@@ -208,7 +218,7 @@ namespace MiniMap
             else if (keyboardState.IsKeyDown(Keys.F1))
             {
                 client.SetState(RobotState.Teleop);
-            } 
+            }
             else if (keyboardState.IsKeyDown(Keys.F2))
             {
                 client.SetState(RobotState.Auto);
@@ -216,6 +226,34 @@ namespace MiniMap
             else if (keyboardState.IsKeyDown(Keys.F3))
             {
                 client.SetState(RobotState.Disabled);
+            }
+            else if (keyboardState.IsKeyDown(Keys.D1))
+            {
+                movingCamera = false;
+                effect3D.View = Matrix.CreateLookAt(cameraPosition1,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
+            }
+            else if (keyboardState.IsKeyDown(Keys.D2))
+            {
+                movingCamera = false;
+                effect3D.View = Matrix.CreateLookAt(cameraPosition2,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
+            }
+            else if (keyboardState.IsKeyDown(Keys.D3))
+            {
+                movingCamera = false;
+                effect3D.View = Matrix.CreateLookAt(cameraPosition3,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
+            }
+            else if (keyboardState.IsKeyDown(Keys.D4))
+            {
+                movingCamera = false;
+                effect3D.View = Matrix.CreateLookAt(cameraPosition4,
+            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
+            }
+            else if (keyboardState.IsKeyDown(Keys.D5))
+            {
+                movingCamera = true;
             }
 
             UpdateRobotPosition();
@@ -234,19 +272,35 @@ namespace MiniMap
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            effect3D.View = robot.GetCameraView();
+            Restore3DSettings();
+            
+            if (movingCamera)
+                effect3D.View = robot.GetCameraView();
             field.Draw(GraphicsDevice, effect3D);
+            robot.DrawRobot(GraphicsDevice, effect3D);
+            ball.Draw(GraphicsDevice, effect3D);
 
+            //spritebatch enables cull mode, and disable depth calculations
             spriteBatch.Begin();
             spriteBatch.Draw(map, new Rectangle(graphics.PreferredBackBufferWidth - MiniMapLong,
                 graphics.PreferredBackBufferHeight - MiniMapShort, MiniMapLong, MiniMapShort),
                 null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
             //robotOld.DrawRobotOnMap(spriteBatch, chassis);
             robot.DrawRobotOnMap(spriteBatch, chassis);
+            ball.DrawOnMap(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);
         }
+
+        private void Restore3DSettings()
+        {
+            //draw also backed traingles - doesn't help with the 0 z length vision targets
+            RasterizerState state = new RasterizerState();
+            state.CullMode = CullMode.None;
+            GraphicsDevice.RasterizerState = state;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+        }
     }
 }
+            

@@ -39,14 +39,9 @@ namespace MiniMap.Animation3D
                 new Vector3(minusX, wheelRadius, -length / 2 + 1.2f * wheelRadius));
         }
 
-        public void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)
+        public void Draw(GraphicsDevice device, BasicEffect effect, BasicEffect lighting, float angleY = 0)
         {
-
-            float angleYDegrees = MathHelper.ToDegrees(angleY) % 360;
-            if (angleYDegrees < 0)
-                angleYDegrees += 360;
-
-            box.Draw(device, effect, angleY);
+            box.Draw(device, lighting, angleY);
             frontLeft.Draw(device, effect, angleY);
             rearLeft.Draw(device, effect, angleY);
 

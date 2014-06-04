@@ -20,6 +20,11 @@ namespace MiniMap.Animation3D
         public float Radius { get; set; }
 
         public Vector3 Position { get; set; }
+
+        public Sphere(Texture2D texture, BoundingSphere sphere)
+            : this(texture, sphere.Center, sphere.Radius, 40)
+        { }
+
         /// <summary>
         /// Constructs a new sphere primitive,
         /// with the specified size and tessellation level.

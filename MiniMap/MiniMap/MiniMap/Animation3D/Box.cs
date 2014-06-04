@@ -56,67 +56,69 @@ namespace MiniMap.Animation3D
             NUM_VERTICES = 36;
             vertices = new VertexPositionNormalTexture[NUM_VERTICES];
 
-            // Normal vectors for each face (needed for lighting / display)
-            Vector3 normalFront = Vector3.Forward;// Normal((int)Plane.Front);
-            Vector3 normalBack = Vector3.Backward; //Normal((int)Plane.Back);
-            Vector3 normalTop = Vector3.Up;//Normal((int)Plane.Top);
-            Vector3 normalBottom = Vector3.Down;//Normal((int)Plane.Bottom);
-            Vector3 normalLeft = Vector3.Left;//Normal((int)Plane.Left);
-            Vector3 normalRight = Vector3.Right;//Normal((int)Plane.Right);
+            // I'm using left-handed coordinate system so the directions are opposite
+            Vector3 front = Vector3.Backward;
+            Vector3 back = Vector3.Forward; 
+            Vector3 top = Vector3.Up;
+            Vector3 bottom = Vector3.Down;
+            Vector3 left = Vector3.Right;
+            Vector3 right = Vector3.Left;
 
             // UV texture coordinates
-            Vector2 textureTopLeft = new Vector2(1.0f, 0.0f);
-            Vector2 textureTopRight = new Vector2(0.0f, 0.0f);
-            Vector2 textureBottomLeft = new Vector2(1.0f, 1.0f);
-            Vector2 textureBottomRight = new Vector2(0.0f, 1.0f);
+            Vector2 topLeft = new Vector2(0.0f, 0.0f);
+            Vector2 topRight = new Vector2(1.0f, 0.0f);
+            Vector2 bottomLeft = new Vector2(0.0f, 1.0f);
+            Vector2 bottomRight = new Vector2(1.0f, 1.0f);
+
 
             // Add the vertices for the FRONT face.
-            vertices[0] = new VertexPositionNormalTexture(topLeftFront, normalFront, textureTopLeft);
-            vertices[1] = new VertexPositionNormalTexture(btmLeftFront, normalFront, textureBottomLeft);
-            vertices[2] = new VertexPositionNormalTexture(topRightFront, normalFront, textureTopRight);
-            vertices[3] = new VertexPositionNormalTexture(btmLeftFront, normalFront, textureBottomLeft);
-            vertices[4] = new VertexPositionNormalTexture(btmRightFront, normalFront, textureBottomRight);
-            vertices[5] = new VertexPositionNormalTexture(topRightFront, normalFront, textureTopRight);
+            vertices[0] = new VertexPositionNormalTexture(topRightFront, front, topLeft);
+            vertices[1] = new VertexPositionNormalTexture(btmRightFront, front, bottomLeft);
+            vertices[2] = new VertexPositionNormalTexture(topLeftFront, front, topRight);
+            vertices[3] = new VertexPositionNormalTexture(topLeftFront, front, topRight);
+            vertices[4] = new VertexPositionNormalTexture(btmRightFront, front, bottomLeft);
+            vertices[5] = new VertexPositionNormalTexture(btmLeftFront, front, bottomRight);
+
 
             // Add the vertices for the BACK face.
-            vertices[6] = new VertexPositionNormalTexture(topLeftBack, normalBack, textureTopRight);
-            vertices[7] = new VertexPositionNormalTexture(topRightBack, normalBack, textureTopLeft);
-            vertices[8] = new VertexPositionNormalTexture(btmLeftBack, normalBack, textureBottomRight);
-            vertices[9] = new VertexPositionNormalTexture(btmLeftBack, normalBack, textureBottomRight);
-            vertices[10] = new VertexPositionNormalTexture(topRightBack, normalBack, textureTopLeft);
-            vertices[11] = new VertexPositionNormalTexture(btmRightBack, normalBack, textureBottomLeft);
+            vertices[6] = new VertexPositionNormalTexture(topLeftBack, back, topLeft);
+            vertices[7] = new VertexPositionNormalTexture(btmLeftBack, back, bottomLeft);
+            vertices[8] = new VertexPositionNormalTexture(topRightBack, back, topRight);
+            vertices[9] = new VertexPositionNormalTexture(topRightBack, back, topRight);
+            vertices[10] = new VertexPositionNormalTexture(btmLeftBack, back, bottomLeft);
+            vertices[11] = new VertexPositionNormalTexture(btmRightBack, back, bottomRight);
 
             // Add the vertices for the TOP face.
-            vertices[12] = new VertexPositionNormalTexture(topLeftFront, normalTop, textureBottomLeft);
-            vertices[13] = new VertexPositionNormalTexture(topRightBack, normalTop, textureTopRight);
-            vertices[14] = new VertexPositionNormalTexture(topLeftBack, normalTop, textureTopLeft);
-            vertices[15] = new VertexPositionNormalTexture(topLeftFront, normalTop, textureBottomLeft);
-            vertices[16] = new VertexPositionNormalTexture(topRightFront, normalTop, textureBottomRight);
-            vertices[17] = new VertexPositionNormalTexture(topRightBack, normalTop, textureTopRight);
+            vertices[12] = new VertexPositionNormalTexture(topLeftFront, top, topLeft);
+            vertices[13] = new VertexPositionNormalTexture(topLeftBack, top, bottomLeft);
+            vertices[14] = new VertexPositionNormalTexture(topRightFront, top, topRight);
+            vertices[15] = new VertexPositionNormalTexture(topRightFront, top, topRight);
+            vertices[16] = new VertexPositionNormalTexture(topLeftBack, top, bottomLeft);
+            vertices[17] = new VertexPositionNormalTexture(topRightBack, top, bottomRight);
 
             // Add the vertices for the BOTTOM face. 
-            vertices[18] = new VertexPositionNormalTexture(btmLeftFront, normalBottom, textureTopLeft);
-            vertices[19] = new VertexPositionNormalTexture(btmLeftBack, normalBottom, textureBottomLeft);
-            vertices[20] = new VertexPositionNormalTexture(btmRightBack, normalBottom, textureBottomRight);
-            vertices[21] = new VertexPositionNormalTexture(btmLeftFront, normalBottom, textureTopLeft);
-            vertices[22] = new VertexPositionNormalTexture(btmRightBack, normalBottom, textureBottomRight);
-            vertices[23] = new VertexPositionNormalTexture(btmRightFront, normalBottom, textureTopRight);
+            vertices[18] = new VertexPositionNormalTexture(btmLeftBack, bottom, topLeft);
+            vertices[19] = new VertexPositionNormalTexture(btmLeftFront, bottom, bottomLeft);
+            vertices[20] = new VertexPositionNormalTexture(btmRightBack, bottom, topRight);
+            vertices[21] = new VertexPositionNormalTexture(btmRightBack, bottom, topRight);
+            vertices[22] = new VertexPositionNormalTexture(btmLeftFront, bottom, bottomLeft);
+            vertices[23] = new VertexPositionNormalTexture(btmRightFront, bottom, bottomRight);
 
             // Add the vertices for the LEFT face.
-            vertices[24] = new VertexPositionNormalTexture(topLeftFront, normalLeft, textureTopRight);
-            vertices[25] = new VertexPositionNormalTexture(btmLeftBack, normalLeft, textureBottomLeft);
-            vertices[26] = new VertexPositionNormalTexture(btmLeftFront, normalLeft, textureBottomRight);
-            vertices[27] = new VertexPositionNormalTexture(topLeftBack, normalLeft, textureTopLeft);
-            vertices[28] = new VertexPositionNormalTexture(btmLeftBack, normalLeft, textureBottomLeft);
-            vertices[29] = new VertexPositionNormalTexture(topLeftFront, normalLeft, textureTopRight);
+            vertices[24] = new VertexPositionNormalTexture(topLeftFront, left, topLeft);
+            vertices[25] = new VertexPositionNormalTexture(btmLeftFront, left, bottomLeft);
+            vertices[26] = new VertexPositionNormalTexture(topLeftBack, left, topRight);
+            vertices[27] = new VertexPositionNormalTexture(topLeftBack, left, topRight);
+            vertices[28] = new VertexPositionNormalTexture(btmLeftFront, left, bottomLeft);
+            vertices[29] = new VertexPositionNormalTexture(btmLeftBack, left, bottomRight);
 
             // Add the vertices for the RIGHT face. 
-            vertices[30] = new VertexPositionNormalTexture(topRightFront, normalRight, textureTopLeft);
-            vertices[31] = new VertexPositionNormalTexture(btmRightFront, normalRight, textureBottomLeft);
-            vertices[32] = new VertexPositionNormalTexture(btmRightBack, normalRight, textureBottomRight);
-            vertices[33] = new VertexPositionNormalTexture(topRightBack, normalRight, textureTopRight);
-            vertices[34] = new VertexPositionNormalTexture(topRightFront, normalRight, textureTopLeft);
-            vertices[35] = new VertexPositionNormalTexture(btmRightBack, normalRight, textureBottomRight);
+            vertices[30] = new VertexPositionNormalTexture(topRightBack, right, topLeft);
+            vertices[31] = new VertexPositionNormalTexture(btmRightBack, right, bottomLeft);
+            vertices[32] = new VertexPositionNormalTexture(topRightFront, right, topRight);
+            vertices[33] = new VertexPositionNormalTexture(topRightFront, right, topRight);
+            vertices[34] = new VertexPositionNormalTexture(btmRightBack, right, bottomLeft);
+            vertices[35] = new VertexPositionNormalTexture(btmRightFront, right, bottomRight);
         }
 
         public void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)

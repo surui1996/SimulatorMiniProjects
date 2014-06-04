@@ -18,8 +18,9 @@ namespace MiniMap
 
         public float RightOutput { get; set; }
         public float LeftOutput { get; set; }
-        
-        public Vector3 Position { get; set; }
+
+        public Vector3 Position { get { return RelativePosition + initialPositionOn3D / FieldConstants.PIXELS_IN_ONE_METER; } }
+        public Vector3 RelativePosition { get; set; }
         public float Orientation { get; set; }
         public float CameraOrientation { get; set; }
 
@@ -86,12 +87,12 @@ namespace MiniMap
             if (velocityLeftZero || velocityRightZero)
                 angularVelocity *= 2;
 
-            Position += velocity * new Vector3((float)Math.Sin(Orientation), 0,
+            RelativePosition += velocity * new Vector3((float)Math.Sin(Orientation), 0,
                 (float)Math.Cos(Orientation)) * dt;//;//mapMetersToPixel;
             Orientation += angularVelocity * dt;
 
             //in map-pixels coordinate system
-            Vector3 mapVector = Position * mapMetersToPixel;
+            Vector3 mapVector = RelativePosition * mapMetersToPixel;
             Vector2 pos = new Vector2(mapVector.Z, -mapVector.X);            
             cornerFrontLeft = pos + Vector2.Transform(new Vector2(CHASSIS_LENGTH / 2, -CHASSIS_WIDTH / 2) * mapMetersToPixel,
                 Matrix.CreateRotationZ(-Orientation));
@@ -111,7 +112,7 @@ namespace MiniMap
 
         public Matrix GetCameraView()
         {
-            Vector3 cameraPosition = Position * FieldConstants.PIXELS_IN_ONE_METER + initialPositionOn3D + CameraRelativePosition;
+            Vector3 cameraPosition = RelativePosition * FieldConstants.PIXELS_IN_ONE_METER + initialPositionOn3D + CameraRelativePosition;
 
             Matrix rotationMatrix = Matrix.CreateRotationX(CameraOrientation)
                 * Matrix.CreateRotationY(Orientation);
@@ -124,6 +125,44 @@ namespace MiniMap
 
             // Set up the view matrix and projection matrix.
             return Matrix.CreateLookAt(cameraPosition, cameraLookat, Vector3.Up);
+        }
+
+        //not working well
+        public BoundingBox GetBoundingBox()
+        {
+            Vector3 centerPosition = initialPositionOn3D + RelativePosition * FieldConstants.PIXELS_IN_ONE_METER;      
+            
+            Vector3 cornerLowRearLeft = centerPosition + Vector3.Transform(new Vector3(-CHASSIS_WIDTH / 2, 0, -CHASSIS_LENGTH / 2) * FieldConstants.PIXELS_IN_ONE_METER,
+                Matrix.CreateRotationY(Orientation));
+            Vector3 cornerUpFrontRight = centerPosition + Vector3.Transform(new Vector3(CHASSIS_WIDTH / 2, WHEEL_RADIUS * 2, CHASSIS_LENGTH / 2) * FieldConstants.PIXELS_IN_ONE_METER,
+                Matrix.CreateRotationY(Orientation));
+
+            Vector3 min = new Vector3(0, 0, 0);
+            Vector3 max = new Vector3(0, WHEEL_RADIUS * 2, 0);
+
+            return new BoundingBox(cornerLowRearLeft, cornerUpFrontRight);
+        }
+
+        public BoundingSphere GetBoundingSphere()
+        {
+            Vector3 centerPosition = initialPositionOn3D + RelativePosition * FieldConstants.PIXELS_IN_ONE_METER;
+
+            return new BoundingSphere(centerPosition + Vector3.UnitY * WHEEL_RADIUS * FieldConstants.PIXELS_IN_ONE_METER,
+                CHASSIS_LENGTH * FieldConstants.PIXELS_IN_ONE_METER / 2f);
+        }
+
+        public Vector3 GetVelocity()
+        {
+            float vL = LeftOutput * MAXIMUM_VELOCITY;
+            if (velocityLeftZero)
+                vL = 0;
+
+            float vR = RightOutput * MAXIMUM_VELOCITY;
+            if (velocityRightZero)
+                vR = 0;
+
+            return ((vR + vL) / 2) * new Vector3((float)Math.Sin(Orientation), 0,
+                (float)Math.Cos(Orientation));
         }
 
         public void ResetGyro()
@@ -196,7 +235,7 @@ namespace MiniMap
 
         public void DrawRobotOnMap(SpriteBatch spriteBatch, Texture2D chassisTexture)
         {
-            Vector3 mapVector = Position * mapMetersToPixel;
+            Vector3 mapVector = RelativePosition * mapMetersToPixel;
             spriteBatch.Draw(chassisTexture, new Vector2(mapVector.Z, -mapVector.X) + initialPositionOnMap,
                 null, Color.White, -this.Orientation, new Vector2(50, 25), (mapMetersToPixel) / 100,
                 SpriteEffects.None, 0);
@@ -210,12 +249,18 @@ namespace MiniMap
             //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
         }
 
-        public void DrawRobot(GraphicsDevice device, BasicEffect effect)
+        public void DrawRobot(GraphicsDevice device, BasicEffect effect, BasicEffect lighting)
         {
             Matrix oldWorld = effect.World;
-            effect.World = Matrix.CreateTranslation(initialPositionOn3D + Position * FieldConstants.PIXELS_IN_ONE_METER) * effect.World;
-            wheeledBox.Draw(device, effect, Orientation);
+            Matrix oldLighting = lighting.World;
+
+            effect.World = Matrix.CreateTranslation(initialPositionOn3D + RelativePosition * FieldConstants.PIXELS_IN_ONE_METER) * effect.World;
+            lighting.World = Matrix.CreateTranslation(initialPositionOn3D + RelativePosition * FieldConstants.PIXELS_IN_ONE_METER) * lighting.World;
+            
+            wheeledBox.Draw(device, effect, lighting, Orientation);
+
             effect.World = oldWorld;
+            lighting.World = oldLighting;
         }
 
         private bool velocityRightZero, velocityLeftZero;

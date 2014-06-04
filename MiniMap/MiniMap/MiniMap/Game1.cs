@@ -26,7 +26,7 @@ namespace MiniMap
         RobotClient client;
 
         // Content
-        BasicEffect effect3D;
+        BasicEffect effect3D, effectWithLighting;
         Field field;
         Robot robot;
         GameBall ball;
@@ -132,7 +132,7 @@ namespace MiniMap
                 0, FieldConstants.HEIGHT / 2),
                 new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2),
                 graphics.PreferredBackBufferHeight - (MiniMapShort / 4)), metersToPixel,
-                Content.Load<Texture2D>("greenBall"), Content.Load<Texture2D>("sphereLogo"));
+                Content.Load<Texture2D>("greenBall"), Content.Load<Texture2D>("ballLogo"));
 
             field = new Field(Content);
 
@@ -143,6 +143,11 @@ namespace MiniMap
             effect3D = new BasicEffect(GraphicsDevice);
             effect3D.TextureEnabled = true;
             effect3D.Projection = proj;
+
+            effectWithLighting = new BasicEffect(GraphicsDevice);
+            effectWithLighting.TextureEnabled = true;
+            effectWithLighting.Projection = proj;
+            effectWithLighting.EnableDefaultLighting();
         }
 
         /// <summary>
@@ -175,14 +180,14 @@ namespace MiniMap
                 Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
                 Vector3 v = new Vector3(0, 0, forwardSpeed);
                 v = Vector3.Transform(v, rotation);
-                robot.Position += new Vector3(v.X, 0, v.Z);
+                robot.RelativePosition += new Vector3(v.X, 0, v.Z);
             }
             if (keyboardState.IsKeyDown(Keys.Down))
             {
                 Matrix rotation = Matrix.CreateRotationY(robot.Orientation);
                 Vector3 v = new Vector3(0, 0, -forwardSpeed);
                 v = Vector3.Transform(v, rotation);
-                robot.Position += new Vector3(v.X, 0, v.Z);
+                robot.RelativePosition += new Vector3(v.X, 0, v.Z);
             }
             if (keyboardState.IsKeyDown(Keys.W))
             {
@@ -255,15 +260,29 @@ namespace MiniMap
             {
                 movingCamera = true;
             }
+            else if (keyboardState.IsKeyDown(Keys.P))
+            {
+                if (Math.Abs((robot.Position - ball.Position).Length()) < 1)
+                    ball.PutOnRobot();
+            }
+            else if (keyboardState.IsKeyDown(Keys.S))
+            {
+                ball.ShootBall(robot.Orientation);
+            }
+
+            if (ball.IsScored)
+                ball.Restore();
 
             UpdateRobotPosition();
 
             //robotOld.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            ball.Update((float)gameTime.ElapsedGameTime.TotalSeconds, robot.GetBoundingSphere(), robot.GetVelocity());
 
             base.Update(gameTime);
         }
 
+        Sphere s1, s2;
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -276,9 +295,15 @@ namespace MiniMap
             
             if (movingCamera)
                 effect3D.View = robot.GetCameraView();
+            effectWithLighting.View = effect3D.View;
+
             field.Draw(GraphicsDevice, effect3D);
-            robot.DrawRobot(GraphicsDevice, effect3D);
-            ball.Draw(GraphicsDevice, effect3D);
+            robot.DrawRobot(GraphicsDevice, effect3D, effectWithLighting);
+
+            
+            ball.Draw(GraphicsDevice, effectWithLighting);
+
+            
 
             //spritebatch enables cull mode, and disable depth calculations
             spriteBatch.Begin();

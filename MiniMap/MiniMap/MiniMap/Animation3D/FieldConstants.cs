@@ -15,8 +15,8 @@ namespace MiniMap.Animation3D
         public const float RATIOZX = HEIGHT / WIDTH;
         public const float PICTURE_RATIO = 961f / 351f;
         public const float HIGHGOAL_HEIGHT = 3f + (1f / 12f);
-        private const float high_goal_bottom_above_carpet = 6f + (10.75f / 12f);
-        public const float HEIGHT_ABOVE_CARPET = high_goal_bottom_above_carpet + HIGHGOAL_HEIGHT;
+        public const float HIGH_GOAL_BOTTOM_ABOVE_CARPET = 6f + (10.75f / 12f);
+        public const float HEIGHT_ABOVE_CARPET = HIGH_GOAL_BOTTOM_ABOVE_CARPET + HIGHGOAL_HEIGHT;
         public const float RATIOYX = WIDTH / HEIGHT_ABOVE_CARPET;
         //public static float LOWGOAL_HEIGHT_ABOVE_CARPET = 7f / 12f; // 7 in.
         //public static float LOWGOAL_HEIGHT = 2f + 4f / 12f; //2 ft. 4 in.

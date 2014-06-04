@@ -26,7 +26,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\visionBlue.xnb</Output>
-      <Time>2014-04-18T23:24:34.9062703+03:00</Time>
+      <Time>2014-06-04T13:45:22.236403+03:00</Time>
     </Item>
     <Item>
       <Source>visionRed.jpg</Source>
@@ -44,7 +44,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\carpet3D.xnb</Output>
-      <Time>2014-04-25T15:34:52.2027739+03:00</Time>
+      <Time>2014-06-04T23:33:54.9069075+03:00</Time>
     </Item>
     <Item>
       <Source>truss.png</Source>
@@ -92,22 +92,31 @@
       <Time>2014-04-26T16:04:06.0803456+03:00</Time>
     </Item>
     <Item>
-      <Source>sphereLogo.png</Source>
-      <Name>sphereLogo</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\sphereLogo.xnb</Output>
-      <Time>2014-06-03T12:28:04.022499+03:00</Time>
-    </Item>
-    <Item>
       <Source>greenBall.png</Source>
       <Name>greenBall</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\greenBall.xnb</Output>
-      <Time>2014-06-03T12:33:04.7504822+03:00</Time>
+      <Time>2014-06-04T22:19:25.005723+03:00</Time>
+    </Item>
+    <Item>
+      <Source>ballLogo.jpg</Source>
+      <Name>ballLogo</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\ballLogo.xnb</Output>
+      <Time>2014-06-04T22:10:57.9108775+03:00</Time>
+    </Item>
+    <Item>
+      <Source>wallBlue.png</Source>
+      <Name>wallBlue</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\wallBlue.xnb</Output>
+      <Time>2014-06-04T13:54:43.342577+03:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

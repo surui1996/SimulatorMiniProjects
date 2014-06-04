@@ -110,15 +110,22 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="sphereLogo.png">
-      <Name>sphereLogo</Name>
+    <Compile Include="greenBall.png">
+      <Name>greenBall</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="greenBall.png">
-      <Name>greenBall</Name>
+    <Compile Include="ballLogo.jpg">
+      <Name>ballLogo</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="wallBlue.png">
+      <Name>wallBlue</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

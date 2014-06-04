@@ -16,10 +16,10 @@ namespace MiniMap.Animation3D
 
         public Field(ContentManager content)
         {
-            wallRed = new Box(content.Load<Texture2D>("visionRed"), FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0,
+            wallRed = new Box(content.Load<Texture2D>("visionRed"), FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0.0001f,
                new Vector3(0, 0, FieldConstants.HEIGHT), FieldConstants.C);
 
-            wallBlue = new Box(content.Load<Texture2D>("visionBlue"), FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0,
+            wallBlue = new Box(content.Load<Texture2D>("wallBlue"), FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0.0001f,
                 Vector3.Zero, FieldConstants.C);
 
             boundryRight = new Box(content.Load<Texture2D>("boundryGrey"), FieldConstants.WIDTH / 50,

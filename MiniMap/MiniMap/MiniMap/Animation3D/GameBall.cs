@@ -113,6 +113,7 @@ namespace MiniMap.Animation3D
                         Velocity -= new Vector3(Velocity.X / 10, Velocity.Y / 10, 1.8f * Velocity.Z);
                 
 
+
                 if (boundingSphere.Center.Z < 0 || boundingSphere.Center.Z > FieldConstants.C * FieldConstants.HEIGHT)
                     IsScored = true;
 

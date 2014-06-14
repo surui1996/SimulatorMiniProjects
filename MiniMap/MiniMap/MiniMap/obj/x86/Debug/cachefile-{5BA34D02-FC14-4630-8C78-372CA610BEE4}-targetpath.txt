@@ -11,3 +11,5 @@ Content\boundryGrey.xnb
 Content\greenBall.xnb
 Content\ballLogo.xnb
 Content\wallBlue.xnb
+Content\goalFrame.xnb
+Content\trussVertical.xnb

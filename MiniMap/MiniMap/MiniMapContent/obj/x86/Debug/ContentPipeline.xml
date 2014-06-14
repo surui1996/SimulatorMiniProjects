@@ -53,7 +53,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\truss.xnb</Output>
-      <Time>2014-04-20T11:28:47.9525448+03:00</Time>
+      <Time>2014-06-05T15:14:19.5941908+03:00</Time>
     </Item>
     <Item>
       <Source>innerWheel.png</Source>
@@ -117,6 +117,24 @@
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\wallBlue.xnb</Output>
       <Time>2014-06-04T13:54:43.342577+03:00</Time>
+    </Item>
+    <Item>
+      <Source>goalFrame.png</Source>
+      <Name>goalFrame</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\goalFrame.xnb</Output>
+      <Time>2014-06-04T23:45:21.4279575+03:00</Time>
+    </Item>
+    <Item>
+      <Source>trussVertical.png</Source>
+      <Name>trussVertical</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\trussVertical.xnb</Output>
+      <Time>2014-06-05T15:22:12.5253455+03:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

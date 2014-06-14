@@ -20,7 +20,10 @@ namespace MiniMap.Animation3D
         public const float RATIOYX = WIDTH / HEIGHT_ABOVE_CARPET;
         //public static float LOWGOAL_HEIGHT_ABOVE_CARPET = 7f / 12f; // 7 in.
         //public static float LOWGOAL_HEIGHT = 2f + 4f / 12f; //2 ft. 4 in.
-        public const float LOWGOAL_WIDTH = 2f + 5f / 12f; //2 ft. 5 in.
+        public const float LOWGOAL_WIDTH = 2f + 12f / 12f; //2 ft. 8.5 in.
+
+        public const float TRUSS_SQUARE_EDGE = 1; //1 ft
+        public const float TRUSS_HEIGHT_ABOVE_CARPET = 5f + 2f / 12f; //5 ft 2 in
 
         public const float FOOT_IN_METERS = 0.3048f;
         public const float HEIGHT_IN_METERS = HEIGHT * FOOT_IN_METERS;
@@ -35,7 +38,7 @@ namespace MiniMap.Animation3D
         public const float STATIC_BLACK_STRIPES_WIDTH = 2f / 12f; //2 in.
 
         //1foot = C pixels
-        public const float C = 10f;
+        public const float C = 15f;
         public const float PIXELS_IN_ONE_METER = FieldConstants.C / FieldConstants.FOOT_IN_METERS;
 
 

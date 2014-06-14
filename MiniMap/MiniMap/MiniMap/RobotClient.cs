@@ -77,7 +77,7 @@ namespace MiniMap
                             StringSplitOptions.None)[1]);
                         
                         //TODO: find a prettier way..
-                        if(Game1.keyboardState.IsKeyDown(key))
+                        if(SimulatorGame.keyboardState.IsKeyDown(key))
                             client.Send(GetBytes("KEY " + key.ToString() +  "=True;"));
                         else
                             client.Send(GetBytes("KEY " + key.ToString() + "=False;")); 

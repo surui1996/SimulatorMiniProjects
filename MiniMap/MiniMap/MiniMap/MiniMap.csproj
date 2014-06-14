@@ -121,9 +121,8 @@
     <Compile Include="Animation3D\WheeledBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Game1.cs" />
+    <Compile Include="SimulatorGame.cs" />
     <Compile Include="Robot.cs" />
-    <Compile Include="RobotOld.cs" />
     <Compile Include="RobotClient.cs" />
   </ItemGroup>
   <ItemGroup>

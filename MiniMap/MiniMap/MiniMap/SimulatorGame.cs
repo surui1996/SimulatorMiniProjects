@@ -17,7 +17,7 @@ namespace MiniMap
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class SimulatorGame : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -53,17 +53,15 @@ namespace MiniMap
         Vector3 cameraPosition1, cameraPosition2, cameraPosition3, cameraPosition4;
         bool movingCamera = true;
 
-        public Game1()
+        public SimulatorGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
             //graphics.IsFullScreen = true;
-            graphics.PreferredBackBufferWidth = 1365 / 2;
-            graphics.PreferredBackBufferHeight = 765 / 2;
+            graphics.PreferredBackBufferWidth = (int)(1365 / 1.5f);
+            graphics.PreferredBackBufferHeight = (int)(765 / 1.5f);
             metersToPixel = MiniMapLong / FieldConstants.HEIGHT_IN_METERS;
-            //robotOld = new RobotOld(new Vector2(graphics.PreferredBackBufferWidth - (MiniMapWidth / 2f),
-            //    graphics.PreferredBackBufferHeight - (MiniMapHeight / 2f)), metersToPixel);
 
             cameraPosition1 = FieldConstants.C * new Vector3(-FieldConstants.WIDTH * 1.2f, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 2);
             cameraPosition4 = FieldConstants.C * new Vector3(FieldConstants.WIDTH * 0.500001f, FieldConstants.HEIGHT * 0.93f, FieldConstants.HEIGHT / 2);
@@ -297,11 +295,12 @@ namespace MiniMap
                 effect3D.View = robot.GetCameraView();
             effectWithLighting.View = effect3D.View;
 
+            ball.Draw(GraphicsDevice, effectWithLighting);
             field.Draw(GraphicsDevice, effect3D);
             robot.DrawRobot(GraphicsDevice, effect3D, effectWithLighting);
 
             
-            ball.Draw(GraphicsDevice, effectWithLighting);
+            
 
             
 

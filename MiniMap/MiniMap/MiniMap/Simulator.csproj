@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MiniMap</RootNamespace>
-    <AssemblyName>MiniMap</AssemblyName>
+    <RootNamespace>Simulator</RootNamespace>
+    <AssemblyName>Simulator</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
@@ -16,8 +16,8 @@
     <XnaProfile>HiDef</XnaProfile>
     <XnaCrossPlatformGroupID>f0bdba81-638a-4015-aa47-25adbd8ebb5e</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
-    <ApplicationIcon>Game.ico</ApplicationIcon>
-    <Thumbnail>GameThumbnail.png</Thumbnail>
+    <ApplicationIcon>Main\Game.ico</ApplicationIcon>
+    <Thumbnail>Main\GameThumbnail.png</Thumbnail>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -113,26 +113,29 @@
     <Compile Include="Animation3D\Box.cs" />
     <Compile Include="Animation3D\Circle.cs" />
     <Compile Include="Animation3D\Cylinder.cs" />
+    <Compile Include="Animation3D\Drawable3D.cs" />
     <Compile Include="Animation3D\Field.cs" />
-    <Compile Include="Animation3D\FieldConstants.cs" />
-    <Compile Include="Animation3D\GameBall.cs" />
+    <Compile Include="Helpers\FieldConstants.cs" />
+    <Compile Include="PhysicalModeling\DynamicObject.cs" />
+    <Compile Include="PhysicalModeling\GameBall.cs" />
     <Compile Include="Animation3D\HollowCylinder.cs" />
     <Compile Include="Animation3D\Sphere.cs" />
     <Compile Include="Animation3D\WheeledBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="SimulatorGame.cs" />
-    <Compile Include="Robot.cs" />
-    <Compile Include="RobotClient.cs" />
+    <Compile Include="Main\Program.cs" />
+    <Compile Include="Main\SimulatorGame.cs" />
+    <Compile Include="PhysicalModeling\Robot.cs" />
+    <Compile Include="PythonCommunication\RobotServer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Game.ico" />
-    <Content Include="GameThumbnail.png" />
+    <Content Include="Main\Game.ico" />
+    <Content Include="Main\GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MiniMapContent\MiniMapContent.contentproj">
-      <Name>MiniMapContent</Name>
+    <ProjectReference Include="..\MiniMapContent\SimulatorContent.contentproj">
+      <Name>SimulatorContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
+      <Project>{5BA34D02-FC14-4630-8C78-372CA610BEE4}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MiniMap
+namespace Simulator.Main
 {
 #if WINDOWS || XBOX
     static class Program

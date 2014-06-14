@@ -11,8 +11,11 @@ using Microsoft.Xna.Framework.Media;
 using Soopah.Xna.Input;
 using System.Diagnostics;
 using System.Text;
-using MiniMap.Animation3D;
-namespace MiniMap
+using Simulator.Animation3D;
+using Simulator.PhysicalModeling;
+using Simulator.PythonCommunication;
+
+namespace Simulator.Main
 {
     /// <summary>
     /// This is the main type for your game
@@ -22,8 +25,8 @@ namespace MiniMap
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        Texture2D map, chassis;
-        RobotClient client;
+        Texture2D map;
+        RobotServer server;
 
         // Content
         BasicEffect effect3D, effectWithLighting;
@@ -84,15 +87,14 @@ namespace MiniMap
 
         void RunPythonServer()
         {
+            server = new RobotServer(robot);
+            server.Start();
+
             string directory = @"C:\try\my_robot.py";
             //byte[] directoryBytes = Encoding.Default.GetBytes(directory);
             //directory = Encoding.UTF8.GetString(directoryBytes);
 
             RunPyScript(directory);
-
-            //client = new RobotClient(robotOld);
-            client = new RobotClient(robot);
-            client.Start();
         }
 
         Process p;
@@ -117,14 +119,14 @@ namespace MiniMap
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             map = Content.Load<Texture2D>("carpet");
-            chassis = Content.Load<Texture2D>("chassis");
             robot = new Robot(FieldConstants.C * new Vector3(FieldConstants.WIDTH / 2,
                 0, FieldConstants.HEIGHT / 2),
                 new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2f),
                 graphics.PreferredBackBufferHeight - (MiniMapShort / 2f)), metersToPixel,
                  Content.Load<Texture2D>("greenBox"),
                  Content.Load<Texture2D>("innerWheel"),
-                 Content.Load<Texture2D>("plaction"));
+                 Content.Load<Texture2D>("plaction"),
+                 Content.Load<Texture2D>("chassis"));
 
             ball = new GameBall(FieldConstants.C * new Vector3(FieldConstants.WIDTH / 4,
                 0, FieldConstants.HEIGHT / 2),
@@ -213,22 +215,20 @@ namespace MiniMap
             // Allows the game to exit
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
-                client.Stop();
-                p.Kill();
                 this.Exit();
                 return;
             }
             else if (keyboardState.IsKeyDown(Keys.F1))
             {
-                client.SetState(RobotState.Teleop);
+                server.SetState(RobotState.Teleop);
             }
             else if (keyboardState.IsKeyDown(Keys.F2))
             {
-                client.SetState(RobotState.Auto);
+                server.SetState(RobotState.Auto);
             }
             else if (keyboardState.IsKeyDown(Keys.F3))
             {
-                client.SetState(RobotState.Disabled);
+                server.SetState(RobotState.Disabled);
             }
             else if (keyboardState.IsKeyDown(Keys.D1))
             {
@@ -275,12 +275,10 @@ namespace MiniMap
 
             //robotOld.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            ball.Update((float)gameTime.ElapsedGameTime.TotalSeconds, robot.GetBoundingSphere(), robot.GetVelocity());
+            ball.Update((float)gameTime.ElapsedGameTime.TotalSeconds, robot.GetBoundingSphere(), robot.Velocity);
 
             base.Update(gameTime);
         }
-
-        Sphere s1, s2;
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -297,24 +295,29 @@ namespace MiniMap
 
             ball.Draw(GraphicsDevice, effectWithLighting);
             field.Draw(GraphicsDevice, effect3D);
-            robot.DrawRobot(GraphicsDevice, effect3D, effectWithLighting);
+            robot.Draw(GraphicsDevice, effect3D, effectWithLighting);
 
             
-            
-
-            
-
             //spritebatch enables cull mode, and disable depth calculations
             spriteBatch.Begin();
             spriteBatch.Draw(map, new Rectangle(graphics.PreferredBackBufferWidth - MiniMapLong,
                 graphics.PreferredBackBufferHeight - MiniMapShort, MiniMapLong, MiniMapShort),
                 null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
-            //robotOld.DrawRobotOnMap(spriteBatch, chassis);
-            robot.DrawRobotOnMap(spriteBatch, chassis);
+            robot.DrawOnMap(spriteBatch);
             ball.DrawOnMap(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        protected override void OnExiting(Object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+
+            server.Stop();
+            System.Threading.Thread.Sleep(10);
+            p.Kill();
+            Environment.Exit(1);
         }
 
         private void Restore3DSettings()

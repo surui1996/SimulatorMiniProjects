@@ -5,50 +5,59 @@ using System.Text;
 using System.Threading;
 using System.Net.Sockets;
 using Microsoft.Xna.Framework.Input;
+using Simulator.Main;
+using Simulator.PhysicalModeling;
+using System.Net;
 
-namespace MiniMap
+namespace Simulator.PythonCommunication
 {
     enum RobotState { Auto, Teleop, Disabled }
 
-    class RobotClient
+    class RobotServer
     {
-        Thread clientThread;
-        Socket client;    
+        Thread serverThread;
+        Socket server;    
         Robot robot;      
 
-        public RobotClient(Robot robot)
+        public RobotServer(Robot robot)
         {
-            clientThread = new Thread(new ThreadStart(ListenToServer));
-            clientThread.IsBackground = true;
+            serverThread = new Thread(new ThreadStart(ListenToClient));
+            serverThread.IsBackground = true;
 
-            client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             this.robot = robot;
         }
 
         public void Start()
         {
-            clientThread.Start();
+            serverThread.Start();
         }
 
         public void Stop()
         {
-            clientThread.Abort();
+            server.Send(GetBytes("STOP;"));
+            Thread.Sleep(5);
+            serverThread.Abort();
         }
 
         public void SetState(RobotState state)
         {
-            client.Send(GetBytes("STATE " + state.ToString().ToUpper()));
+            server.Send(GetBytes("STATE " + state.ToString().ToUpper()));
         }
 
-        private void ListenToServer()
+        private void ListenToClient()
         {
-            client.Connect("127.0.0.1", 4590);
+            //TODO: at first run code crashes here
+            //server.Connect("127.0.0.1", 4590);
+            server.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4590));
+            server.Listen(5);
+            server = server.Accept();
 
             while (true)
             {
                 byte[] buffer = new byte[1024];
-                client.Receive(buffer);
+                server.Receive(buffer);
                 string request = GetString(buffer);
 
                 try
@@ -78,9 +87,9 @@ namespace MiniMap
                         
                         //TODO: find a prettier way..
                         if(SimulatorGame.keyboardState.IsKeyDown(key))
-                            client.Send(GetBytes("KEY " + key.ToString() +  "=True;"));
+                            server.Send(GetBytes("KEY " + key.ToString() +  "=True;"));
                         else
-                            client.Send(GetBytes("KEY " + key.ToString() + "=False;")); 
+                            server.Send(GetBytes("KEY " + key.ToString() + "=False;")); 
                     }
                     else if (requests[i].IndexOf("ARCADE") == 0)
                     {
@@ -88,8 +97,8 @@ namespace MiniMap
                             StringSplitOptions.None)[1];
                         string[] values = arcade.Split(',');
                         robot.ArcadeDrive(float.Parse(values[0]), float.Parse(values[1]));
-                        client.Send(GetBytes("LeftOutput" + "=" + robot.LeftOutput + ";"));
-                        client.Send(GetBytes("RightOutput" + "=" + robot.RightOutput + ";"));
+                        server.Send(GetBytes("LeftOutput" + "=" + robot.LeftOutput + ";"));
+                        server.Send(GetBytes("RightOutput" + "=" + robot.RightOutput + ";"));
                     }
                     else if (requests[i].IndexOf("TANK") == 0)
                     {
@@ -116,13 +125,13 @@ namespace MiniMap
             switch (get)
             {
                 case "EncoderLeft":
-                    client.Send(GetBytes(get + "=" + robot.EncoderLeft + ";"));
+                    server.Send(GetBytes(get + "=" + robot.EncoderLeft + ";"));
                     break;
                 case "EncoderRight":
-                    client.Send(GetBytes(get + "=" + robot.EncoderRight + ";"));
+                    server.Send(GetBytes(get + "=" + robot.EncoderRight + ";"));
                     break;
                 case "Gyro":
-                    client.Send(GetBytes(get + "=" + robot.GyroAngle + ";"));
+                    server.Send(GetBytes(get + "=" + robot.GyroAngle + ";"));
                     break;
             }
             
@@ -137,8 +146,5 @@ namespace MiniMap
         {
             return Encoding.ASCII.GetBytes(text);
         }
-
-        
-
     }
 }

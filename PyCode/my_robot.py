@@ -32,7 +32,7 @@ class MySimpleRobot(SimpleRobot):
             if self.IsKeyPressed("Z"):
                 self.ArcadeDrive(0.8, 0.0)
             else:
-                self.ArcadeDrive(-0.5, 0.0)
+                self.ArcadeDrive(0.2, 0.0)
             self.Wait(0.005)
 
     def Disabled(self):
@@ -41,3 +41,4 @@ class MySimpleRobot(SimpleRobot):
 if __name__ == "__main__":			
     myRobot = MySimpleRobot()
     myRobot.StartCompetition()
+    exit()

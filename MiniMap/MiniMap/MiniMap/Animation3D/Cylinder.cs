@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace MiniMap.Animation3D
+namespace Simulator.Animation3D
 {
     class Cylinder
     {

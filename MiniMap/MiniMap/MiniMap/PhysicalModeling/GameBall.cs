@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Simulator.Animation3D;
 
-namespace MiniMap.Animation3D
+namespace Simulator.PhysicalModeling
 {
-    class GameBall
+    class GameBall : DynamicObject
     {
-
         private const float BALL_RADIUS = 0.3f; //meters 
         private const float BALL_MASS = 2f; //kg
         private const float GRAVITY_ACCELERATION = 9.8f;
@@ -17,18 +17,10 @@ namespace MiniMap.Animation3D
         private const float AIR_DENSITY = 1.2f;
         private const float SHOOTING_VELOCITY = 10f; //m/s
 
-        public Vector3 Position { get { return RelativePosition + initialPositionOn3D / FieldConstants.PIXELS_IN_ONE_METER; } }
-        public Vector3 RelativePosition { get; set; }
-        public Vector3 Velocity { get; set; }
         public bool IsScored { get; set; }
-
-        private Vector2 initialPositionOnMap;
-        private Vector3 initialPositionOn3D;
-        private float mapMetersToPixel;
 
         private bool ballPossessed = false, ballInAir = false, disappear = false;
 
-        private Texture2D ballTexture2D;
         private Sphere sphere;
 
         public GameBall(Vector3 position3D, Vector2 mapPosition, float mapMetersToPixel,
@@ -37,7 +29,7 @@ namespace MiniMap.Animation3D
             this.initialPositionOn3D = position3D;
             this.initialPositionOnMap = mapPosition;
             this.mapMetersToPixel = mapMetersToPixel;
-            this.ballTexture2D = ball2D;
+            this.textureOnMap = ball2D;
 
             this.RelativePosition = Vector3.Zero;
             this.Velocity = Vector3.Zero;
@@ -163,17 +155,17 @@ namespace MiniMap.Animation3D
             }
         }
 
-        public void DrawOnMap(SpriteBatch spriteBatch)
+        public override void DrawOnMap(SpriteBatch spriteBatch)
         {
             if (disappear)
                 return;
             Vector3 mapVector = RelativePosition * mapMetersToPixel;
-            spriteBatch.Draw(ballTexture2D, new Vector2(mapVector.Z, -mapVector.X) + initialPositionOnMap,
+            spriteBatch.Draw(textureOnMap, new Vector2(mapVector.Z, -mapVector.X) + initialPositionOnMap,
                 null, Color.White, 0, new Vector2(150, 150), (BALL_RADIUS * mapMetersToPixel) / 150,
                 SpriteEffects.None, 0);
         }
 
-        public void Draw(GraphicsDevice device, BasicEffect effect)
+        public override void Draw(GraphicsDevice device, BasicEffect effect, BasicEffect lighting = null)
         {
             if (disappear)
                 return;

@@ -2,12 +2,13 @@ import socket
 import time
 from threading import Thread
 
-class RobotServer(Thread):
+class RobotClient(Thread):
     def __init__(self):
         Thread.__init__(self)
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client = None
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		
+        self.isUp = False
+        self.stop = False
         self.GameState = "TELEOP"
 		
         self.robotValues = {}
@@ -22,7 +23,7 @@ class RobotServer(Thread):
         #self.robotValues["Accelerometer"] = 0.0
 
     def IsUp(self):
-        return self.client is not None
+        return self.isUp
 	
     def SendGetRequest(self, name):
         if name == "LeftOutput" or name == "RightOutput":
@@ -64,6 +65,8 @@ class RobotServer(Thread):
             self.SetInDictionary(message)
         elif message.find("STATE") != -1:
             self.GameState = message.split(" ")[1]
+        elif message.find("STOP") != -1:
+            self.stop = True
     
     def IsPressed(self, keyString):
         if keyString not in self.keyboard:
@@ -74,11 +77,12 @@ class RobotServer(Thread):
 	
     def run(self):
         port = 4590
-        self.sock.bind(('127.0.0.1', port))
-        self.sock.listen(5)
-        self.client, addr = self.sock.accept()
+        self.client.connect(('127.0.0.1', port))
+        self.isUp = True
 
         while True:
+            self.UpdateRobotValues()
+            
             messages = self.client.recv(1024)
             if messages.find(";") != -1:
                 for msg in messages.split(";"):
@@ -87,7 +91,10 @@ class RobotServer(Thread):
                         self.ParseMessage(msg)
                         #except:
                         #    pass
-            self.UpdateRobotValues()
+            
+            if self.stop == True:
+                break
+                
             time.sleep(0.005)
 						
     def UpdateRobotValues(self):

@@ -1,10 +1,10 @@
-from robot_server import RobotServer
+from robot_client import RobotClient
 import time
 
 class RobotBase:
     def __init__(self):
-        self.server = RobotServer()
-        self.server.start()
+        self.client = RobotClient()
+        self.client.start()
 
     def IsEnabled(self):
         return self.IsAutonomous() or self.IsOperatorControl()
@@ -13,37 +13,37 @@ class RobotBase:
         return not self.IsEnabled()
 
     def IsAutonomous(self):
-        return self.server.GameState == "AUTO"
+        return self.client.GameState == "AUTO"
 
     def IsOperatorControl(self):
-        return self.server.GameState == "TELEOP"
+        return self.client.GameState == "TELEOP"
 	
     def Wait(self, secs):
         time.sleep(secs)
     
     def GetGyroAngle(self):
-        return self.server.robotValues["Gyro"]
+        return self.client.robotValues["Gyro"]
     
     def ResetGyro(self):
-        return self.server.SendResetMessage("GYRO")
+        return self.client.SendResetMessage("GYRO")
 	
     def ResetEncoders(self):
-        return self.server.SendResetMessage("ENCODERS")
+        return self.client.SendResetMessage("ENCODERS")
     
     def GetEncoderLeft(self):
-        return self.server.robotValues["EncoderLeft"]
+        return self.client.robotValues["EncoderLeft"]
 		
     def GetEncoderRight(self):
-        return self.server.robotValues["EncoderRight"]
+        return self.client.robotValues["EncoderRight"]
 	
     def ArcadeDrive(self, forward, curve):
-        self.server.SendArcadeDriveRequest(forward, curve)
+        self.client.SendArcadeDriveRequest(forward, curve)
 		
     def TankDrive(self, left, right):
-        self.server.SendTankDriveRequest(left, right)	
+        self.client.SendTankDriveRequest(left, right)	
 	
     def IsKeyPressed(self, keyString):
-        return self.server.IsPressed(keyString)
+        return self.client.IsPressed(keyString)
 		
 
 class SimpleRobot(RobotBase):
@@ -55,13 +55,6 @@ class SimpleRobot(RobotBase):
 
     def __init__(self):
         RobotBase.__init__(self)
-
-    #def RobotInit(self):
-    #    """Robot-wide initialization code should go here.
-    #    Programmers should override this method for default Robot-wide
-    #    initialization which will be called each time the robot enters
-    #    the disabled state."""
-    #    pass
     
     def Autonomous(self):
         """Autonomous should go here.
@@ -94,7 +87,7 @@ class SimpleRobot(RobotBase):
         back and wait for the robot to be enabled again."""
 		
         #self.RobotInit()
-        while not self.server.IsUp():
+        while not self.client.IsUp():
             time.sleep(0.005)
 			
         while True:

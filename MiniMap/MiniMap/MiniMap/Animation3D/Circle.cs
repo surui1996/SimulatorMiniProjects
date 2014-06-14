@@ -5,20 +5,16 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MiniMap.Animation3D
+namespace Simulator.Animation3D
 {
-    class Circle
+    class Circle : Drawable3D
     {
-        public Texture2D Texture { get; set; }
-
-        private VertexPositionNormalTexture[] vertices;
         private short[] indices;
 
         private const int RESOLUTION = 10; // degrees between points
         private const int NUM_POINTS = 360 / RESOLUTION;
 
         public float Radius { get; set; }
-        public Vector3 AbsolutePosition { get; set; }
         public Vector3 RelativePosition { get; set; }
 
         public Circle(Texture2D texture, float radius, Vector3 absolutePosition,
@@ -26,7 +22,7 @@ namespace MiniMap.Animation3D
         {
             Texture = texture;
             Radius = radius;
-            AbsolutePosition = absolutePosition;
+            Position = absolutePosition;
             RelativePosition = relativePosition;
 
             vertices = new VertexPositionNormalTexture[NUM_POINTS + 1];
@@ -55,16 +51,14 @@ namespace MiniMap.Animation3D
         }
 
 
-        public void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)
+        public override void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)
         {
             Matrix oldWorld = effect.World;
             Texture2D oldTexture = effect.Texture;
 
             effect.World = Matrix.CreateScale(Radius, Radius, 0) * Matrix.CreateTranslation(RelativePosition)
-                * Matrix.CreateRotationY(3 * MathHelper.PiOver2) * Matrix.CreateTranslation(AbsolutePosition)
+                * Matrix.CreateRotationY(3 * MathHelper.PiOver2) * Matrix.CreateTranslation(Position)
                 * Matrix.CreateRotationY(angleY) * effect.World;
-
-
 
             if (Texture != null)
             {

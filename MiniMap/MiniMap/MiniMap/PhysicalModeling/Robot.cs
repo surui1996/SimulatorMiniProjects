@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MiniMap.Animation3D;
+using Simulator.Animation3D;
 
-namespace MiniMap
+namespace Simulator.PhysicalModeling
 {
-    class Robot
+    class Robot : DynamicObject
     {
         //m.k.s., degrees
 
@@ -19,8 +19,6 @@ namespace MiniMap
         public float RightOutput { get; set; }
         public float LeftOutput { get; set; }
 
-        public Vector3 Position { get { return RelativePosition + initialPositionOn3D / FieldConstants.PIXELS_IN_ONE_METER; } }
-        public Vector3 RelativePosition { get; set; }
         public float Orientation { get; set; }
         public float CameraOrientation { get; set; }
 
@@ -29,12 +27,6 @@ namespace MiniMap
         private Vector2 cornerFrontRight;
         private Vector2 cornerRearLeft;
         private Vector2 cornerRearRight;
-        
-        private Vector2 initialPositionOnMap;
-        private Vector3 initialPositionOn3D;
-
-        private float mapMetersToPixel;
-        //private float vL, vR, velocity, angularVelocity;
 
         private const float MAXIMUM_VELOCITY = 3f; //m/s
         private const float CHASSIS_WIDTH = 0.5f; //m
@@ -43,17 +35,18 @@ namespace MiniMap
 
         private WheeledBox wheeledBox;
 
-        //CAMERA STUFF
-        //TODO: make it half the size of the robot
         private static Vector3 CameraRelativePosition = Vector3.Zero;
         private static Vector3 CameraStartingOrientation = new Vector3(0, 0, 1);
 
         public Robot(Vector3 position3D, Vector2 mapPosition, float mapMetersToPixel,
-            Texture2D body, Texture2D wheelSide, Texture2D wheelCircumference)
+            Texture2D body, Texture2D wheelSide, Texture2D wheelCircumference,
+            Texture2D robot2D)
         {
             this.initialPositionOn3D = position3D;
             this.initialPositionOnMap = mapPosition;
             this.mapMetersToPixel = mapMetersToPixel;
+
+            this.textureOnMap = robot2D;
 
             GyroAngle = 0;
             EncoderRight = 0;
@@ -87,8 +80,8 @@ namespace MiniMap
             if (velocityLeftZero || velocityRightZero)
                 angularVelocity *= 2;
 
-            RelativePosition += velocity * new Vector3((float)Math.Sin(Orientation), 0,
-                (float)Math.Cos(Orientation)) * dt;//;//mapMetersToPixel;
+            Velocity = Vector3.Transform(Vector3.UnitZ * velocity, Matrix.CreateRotationY(Orientation));
+            RelativePosition += Velocity * dt;
             Orientation += angularVelocity * dt;
 
             //in map-pixels coordinate system
@@ -149,20 +142,6 @@ namespace MiniMap
 
             return new BoundingSphere(centerPosition + Vector3.UnitY * WHEEL_RADIUS * FieldConstants.PIXELS_IN_ONE_METER,
                 CHASSIS_LENGTH * FieldConstants.PIXELS_IN_ONE_METER / 2f);
-        }
-
-        public Vector3 GetVelocity()
-        {
-            float vL = LeftOutput * MAXIMUM_VELOCITY;
-            if (velocityLeftZero)
-                vL = 0;
-
-            float vR = RightOutput * MAXIMUM_VELOCITY;
-            if (velocityRightZero)
-                vR = 0;
-
-            return ((vR + vL) / 2) * new Vector3((float)Math.Sin(Orientation), 0,
-                (float)Math.Cos(Orientation));
         }
 
         public void ResetGyro()
@@ -233,23 +212,15 @@ namespace MiniMap
             RightOutput = right;
         }
 
-        public void DrawRobotOnMap(SpriteBatch spriteBatch, Texture2D chassisTexture)
+        public override void DrawOnMap(SpriteBatch spriteBatch)
         {
             Vector3 mapVector = RelativePosition * mapMetersToPixel;
-            spriteBatch.Draw(chassisTexture, new Vector2(mapVector.Z, -mapVector.X) + initialPositionOnMap,
+            spriteBatch.Draw(textureOnMap, new Vector2(mapVector.Z, -mapVector.X) + initialPositionOnMap,
                 null, Color.White, -this.Orientation, new Vector2(50, 25), (mapMetersToPixel) / 100,
                 SpriteEffects.None, 0);
-            //spriteBatch.Draw(chassisTexture, cornerFrontLeft + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
-            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
-            //spriteBatch.Draw(chassisTexture, cornerFrontRight + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
-            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
-            //spriteBatch.Draw(chassisTexture, cornerRearLeft + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
-            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
-            //spriteBatch.Draw(chassisTexture, cornerRearRight + initialPositionOnMap, new Rectangle(0, 0, 2, 2),
-            //    Color.White, 0, new Vector2(1, 1), 1, SpriteEffects.None, 0);
         }
 
-        public void DrawRobot(GraphicsDevice device, BasicEffect effect, BasicEffect lighting)
+        public override void Draw(GraphicsDevice device, BasicEffect effect, BasicEffect lighting)
         {
             Matrix oldWorld = effect.World;
             Matrix oldLighting = lighting.World;

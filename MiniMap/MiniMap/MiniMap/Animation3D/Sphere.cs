@@ -5,21 +5,14 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace MiniMap.Animation3D
+namespace Simulator.Animation3D
 {
-    class Sphere
-    {// the textures used for mid- and high-latitudes
-        public Texture2D Texture { get; set; }
-
-        // sphere vertices
-        private VertexPositionNormalTexture[] sphere;
-
+    class Sphere : Drawable3D
+    {
         // indices of the traingles, can't use traingle strip - becase there are fans involved
         List<short> sphereIndices = new List<short>();
 
         public float Radius { get; set; }
-
-        public Vector3 Position { get; set; }
 
         public Sphere(Texture2D texture, BoundingSphere sphere)
             : this(texture, sphere.Center, sphere.Radius, 40)
@@ -38,11 +31,11 @@ namespace MiniMap.Animation3D
             Position = position;
             Radius = radius;
 
-            sphere = new VertexPositionNormalTexture[(verticalSegments - 1) * horizontalSegments + 2];
+            vertices = new VertexPositionNormalTexture[(verticalSegments - 1) * horizontalSegments + 2];
 
             // Start with a single vertex at the bottom of the sphere.
-            sphere[0].Position = Vector3.Down * radius; sphere[0].Normal = Vector3.Down;
-            sphere[0].TextureCoordinate = new Vector2(0, 0);
+            vertices[0].Position = Vector3.Down * radius; vertices[0].Normal = Vector3.Down;
+            vertices[0].TextureCoordinate = new Vector2(0, 0);
 
             // Create rings of vertices at progressively higher latitudes.
             for (int i = 0; i < verticalSegments - 1; i++)
@@ -64,19 +57,19 @@ namespace MiniMap.Animation3D
 
                     Vector3 normal = new Vector3(dx, dy, dz);
 
-                    sphere[horizontalSegments * i + j + 1].Position = normal * radius;
-                    sphere[horizontalSegments * i + j + 1].Normal = normal;
+                    vertices[horizontalSegments * i + j + 1].Position = normal * radius;
+                    vertices[horizontalSegments * i + j + 1].Normal = normal;
 
                     float textureX = (MathHelper.TwoPi - longitude) / MathHelper.TwoPi;
                     float textureY = 0.5f - (0.5f * latitude / MathHelper.PiOver2);
-                    sphere[horizontalSegments * i + j + 1].TextureCoordinate =
+                    vertices[horizontalSegments * i + j + 1].TextureCoordinate =
                         new Vector2(textureX, textureY);
                 }
             }
 
-            sphere[(verticalSegments - 1) * horizontalSegments + 1].Position = Vector3.Up * radius;
-            sphere[(verticalSegments - 1) * horizontalSegments + 1].Normal = Vector3.Up;
-            sphere[(verticalSegments - 1) * horizontalSegments + 1].TextureCoordinate = new Vector2(0, 0);
+            vertices[(verticalSegments - 1) * horizontalSegments + 1].Position = Vector3.Up * radius;
+            vertices[(verticalSegments - 1) * horizontalSegments + 1].Normal = Vector3.Up;
+            vertices[(verticalSegments - 1) * horizontalSegments + 1].TextureCoordinate = new Vector2(0, 0);
 
             // Create a fan connecting the bottom vertex to the bottom latitude ring.
             for (int i = 0; i < horizontalSegments; i++)
@@ -119,7 +112,7 @@ namespace MiniMap.Animation3D
         /// </summary>
         /// <param name="device">The device to draw on</param>
         /// <param name="effect">The effect to draw with</param>
-        public void Draw(GraphicsDevice device, BasicEffect effect)
+        public override void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)
         {
             Matrix oldWorld = effect.World;
             Texture2D oldTexture = effect.Texture;
@@ -138,7 +131,7 @@ namespace MiniMap.Animation3D
             {
                 pass.Apply();
                 device.DrawUserIndexedPrimitives<VertexPositionNormalTexture>
-                    (PrimitiveType.TriangleList, sphere, 0, sphere.Length, sphereIndices.ToArray(),
+                    (PrimitiveType.TriangleList, vertices, 0, vertices.Length, sphereIndices.ToArray(),
                     0, sphereIndices.Count / 3);
             }
 

@@ -6,14 +6,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
-namespace MiniMap.Animation3D
+namespace Simulator.Animation3D
 {
-
     class Field
     {
         Box wallRed, wallBlue, carpet3, boundryLeft, boundryRight;
         Box lowGoal, truss, trussVertical;
-        //TexturedWall dynamicRightVision, staticRightVision;
 
         public Field(ContentManager content)
         {

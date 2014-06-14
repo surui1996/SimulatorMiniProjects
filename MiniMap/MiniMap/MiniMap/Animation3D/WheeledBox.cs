@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MiniMap.Animation3D
+namespace Simulator.Animation3D
 {
     class WheeledBox
     {

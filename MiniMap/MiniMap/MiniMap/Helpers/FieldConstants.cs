@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MiniMap.Animation3D
+namespace Simulator
 {
     class FieldConstants
     {

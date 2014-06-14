@@ -5,22 +5,15 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MiniMap.Animation3D
+namespace Simulator.Animation3D
 {
-    class Box
+    class Box : Drawable3D
     {
-
         protected static int NUM_TRIANGLES = 12;
         protected static int NUM_VERTICES = 36;
 
-        // Array of vertex information - contains position, normal and texture data
-        protected VertexPositionNormalTexture[] vertices;
-
         private Vector3 topLeftFront, topLeftBack, topRightFront, topRightBack;
         private Vector3 btmLeftFront, btmLeftBack, btmRightFront, btmRightBack;
-
-        public Vector3 Position { get; set; }
-        public Texture2D Texture { get; set; }
 
         private float x, y, z;
 
@@ -34,8 +27,6 @@ namespace MiniMap.Animation3D
             z = z * scale;
 
             this.x = x; this.y = y; this.z = z;
-
-            //somewhat strange axis system
 
             btmRightFront = new Vector3(0, 0, z);
             btmRightBack = new Vector3(0, 0, 0);
@@ -121,7 +112,7 @@ namespace MiniMap.Animation3D
             vertices[35] = new VertexPositionNormalTexture(btmRightFront, right, bottomRight);
         }
 
-        public void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)
+        public override void Draw(GraphicsDevice device, BasicEffect effect, float angleY = 0)
         {
             Matrix oldWorld = effect.World;
             Texture2D oldTexture = effect.Texture;
@@ -144,8 +135,5 @@ namespace MiniMap.Animation3D
             effect.World = oldWorld;
             effect.Texture = oldTexture;
         }   
-
-
-        
     }
 }

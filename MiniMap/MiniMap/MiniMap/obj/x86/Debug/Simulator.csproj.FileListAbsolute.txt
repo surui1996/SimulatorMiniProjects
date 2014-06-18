@@ -20,3 +20,4 @@ C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\D
 C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Soopah.Xna.Input.dll
 C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\obj\x86\Debug\Simulator.exe
 C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\obj\x86\Debug\Simulator.pdb
+C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\Copy of ballLogo.xnb

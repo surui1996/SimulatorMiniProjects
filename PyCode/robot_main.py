@@ -44,6 +44,15 @@ class RobotBase:
 	
     def IsKeyPressed(self, keyString):
         return self.client.IsPressed(keyString)
+    
+    def TryToPossess(self):
+        self.client.TryToPossess()
+    
+    def IsBallPossessed(self):
+        return self.client.IsBallPossessed()
+    
+    def Shoot(self):
+        self.client.Shoot()
 		
 
 class SimpleRobot(RobotBase):

@@ -46,8 +46,8 @@ namespace Simulator.Main
         static float nearClip = 10.0f;
         static float farClip = 1000.0f;
 
-        private const int MiniMapLong = 741 / 4;
-        private const int MiniMapShort = 335 / 4;
+        private const int MiniMapLong = 741 / 3;
+        private const int MiniMapShort = 335 / 3;
 
         public static KeyboardState keyboardState;
 
@@ -61,9 +61,10 @@ namespace Simulator.Main
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
+            
+            graphics.PreferredBackBufferWidth = (int)(1366 / 1.5);
+            graphics.PreferredBackBufferHeight = (int)(768 / 1.5);
             //graphics.IsFullScreen = true;
-            graphics.PreferredBackBufferWidth = (int)(1365 / 1.5f);
-            graphics.PreferredBackBufferHeight = (int)(765 / 1.5f);
             metersToPixel = MiniMapLong / FieldConstants.HEIGHT_IN_METERS;
 
             cameraPosition1 = FieldConstants.C * new Vector3(-FieldConstants.WIDTH * 1.2f, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 2);
@@ -87,13 +88,10 @@ namespace Simulator.Main
 
         void RunPythonServer()
         {
-            server = new RobotServer(robot);
+            server = new RobotServer(robot, ball);
             server.Start();
 
             string directory = @"C:\try\my_robot.py";
-            //byte[] directoryBytes = Encoding.Default.GetBytes(directory);
-            //directory = Encoding.UTF8.GetString(directoryBytes);
-
             RunPyScript(directory);
         }
 
@@ -103,7 +101,7 @@ namespace Simulator.Main
             p = new Process();
             p.StartInfo.FileName = "python.exe";
             p.StartInfo.RedirectStandardOutput = false;
-            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.UseShellExecute = false; //opens shell window and show errors if any
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.Arguments = scriptName;
             p.Start(); // start the process (the python program)
@@ -265,7 +263,7 @@ namespace Simulator.Main
             }
             else if (keyboardState.IsKeyDown(Keys.S))
             {
-                ball.ShootBall(robot.Orientation);
+                ball.ShootBall(robot.Orientation, robot.Velocity);
             }
 
             if (ball.IsScored)
@@ -294,8 +292,9 @@ namespace Simulator.Main
             effectWithLighting.View = effect3D.View;
 
             ball.Draw(GraphicsDevice, effectWithLighting);
-            field.Draw(GraphicsDevice, effect3D);
             robot.Draw(GraphicsDevice, effect3D, effectWithLighting);
+            field.Draw(GraphicsDevice, effect3D);
+            
 
             
             //spritebatch enables cull mode, and disable depth calculations

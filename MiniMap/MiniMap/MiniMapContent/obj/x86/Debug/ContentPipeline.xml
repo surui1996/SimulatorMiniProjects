@@ -44,7 +44,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\carpet3D.xnb</Output>
-      <Time>2014-06-04T23:33:54.9069075+03:00</Time>
+      <Time>2014-06-18T08:21:28.6520981+03:00</Time>
     </Item>
     <Item>
       <Source>truss.png</Source>
@@ -107,7 +107,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\ballLogo.xnb</Output>
-      <Time>2014-06-04T22:10:57.9108775+03:00</Time>
+      <Time>2014-06-18T08:29:27.5562084+03:00</Time>
     </Item>
     <Item>
       <Source>wallBlue.png</Source>
@@ -135,6 +135,15 @@
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\trussVertical.xnb</Output>
       <Time>2014-06-05T15:22:12.5253455+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Copy of ballLogo.jpg</Source>
+      <Name>Copy of ballLogo</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\Copy of ballLogo.xnb</Output>
+      <Time>2014-06-18T08:27:04.8611494+03:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

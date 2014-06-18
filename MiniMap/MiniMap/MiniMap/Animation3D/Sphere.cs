@@ -14,6 +14,8 @@ namespace Simulator.Animation3D
 
         public float Radius { get; set; }
 
+        public Quaternion Rotation = Quaternion.Identity;
+
         public Sphere(Texture2D texture, BoundingSphere sphere)
             : this(texture, sphere.Center, sphere.Radius, 40)
         { }
@@ -116,10 +118,8 @@ namespace Simulator.Animation3D
         {
             Matrix oldWorld = effect.World;
             Texture2D oldTexture = effect.Texture;
-
-            // tranfrom coordinate system to match radius of this shpere
-            //rotate it with some angular velocity
-            effect.World = Matrix.CreateTranslation(Position) * oldWorld;
+            
+            effect.World = Matrix.CreateFromQuaternion(Rotation) * Matrix.CreateTranslation(Position) * oldWorld;
 
             // draw the sphere
             if (Texture != null)

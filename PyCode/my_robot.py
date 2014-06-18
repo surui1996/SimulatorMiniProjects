@@ -33,6 +33,12 @@ class MySimpleRobot(SimpleRobot):
                 self.ArcadeDrive(0.8, 0.0)
             else:
                 self.ArcadeDrive(0.2, 0.0)
+            
+            if self.IsKeyPressed("P"):
+                self.TryToPossess()
+            
+            #if self.IsBallPossessed():
+            #    self.Shoot()
             self.Wait(0.005)
 
     def Disabled(self):

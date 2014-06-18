@@ -17,9 +17,10 @@ namespace Simulator.PythonCommunication
     {
         Thread serverThread;
         Socket server;    
-        Robot robot;      
+        Robot robot;
+        GameBall ball;
 
-        public RobotServer(Robot robot)
+        public RobotServer(Robot robot, GameBall ball)
         {
             serverThread = new Thread(new ThreadStart(ListenToClient));
             serverThread.IsBackground = true;
@@ -27,6 +28,7 @@ namespace Simulator.PythonCommunication
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             this.robot = robot;
+            this.ball = ball;
         }
 
         public void Start()
@@ -114,8 +116,21 @@ namespace Simulator.PythonCommunication
                         else if (requests[i].IndexOf("GYRO") != -1)
                             robot.ResetGyro();
                     }
+                    else if (requests[i].IndexOf("POSSESS") == 0)
+                    {
+                        if (Math.Abs((robot.Position - ball.Position).Length()) < 1)
+                        {
+                            ball.PutOnRobot();
+                            server.Send(GetBytes("POSSESS True;"));
+                        }
+                        else
+                            server.Send(GetBytes("POSSESS False;"));
+                    }
+                    else if (requests[i].IndexOf("SHOOT") == 0)
+                    {
+                        ball.ShootBall(robot.Orientation, robot.Velocity);
+                    }
 
-                    //TODO: implemet "PRESSED" message
                 }
             }
         }

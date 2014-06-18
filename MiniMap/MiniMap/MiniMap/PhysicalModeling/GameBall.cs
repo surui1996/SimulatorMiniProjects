@@ -16,12 +16,14 @@ namespace Simulator.PhysicalModeling
         private const float DRAG_COEFF = 0.47f;
         private const float AIR_DENSITY = 1.2f;
         private const float SHOOTING_VELOCITY = 10f; //m/s
+        private const float ROTATE_RESISTANCE = 4f;
 
         public bool IsScored { get; set; }
 
         private bool ballPossessed = false, ballInAir = false, disappear = false;
 
         private Sphere sphere;
+        private float pitch = 0, roll = 0;
 
         public GameBall(Vector3 position3D, Vector2 mapPosition, float mapMetersToPixel,
             Texture2D ball2D, Texture2D ballCover)
@@ -62,6 +64,9 @@ namespace Simulator.PhysicalModeling
 
             if (ballInAir)
             {
+                pitch += (Velocity.Z / BALL_RADIUS) * dt / ROTATE_RESISTANCE;
+                roll += (Velocity.X / BALL_RADIUS) * dt / ROTATE_RESISTANCE;
+
                 //Fdrag = 0.5*Cdrag*Density*cross-sectionalArea*v^2, Adrag = fDrag / ballMass
                 float dragForceMagnitude = (float)(0.5 * DRAG_COEFF * AIR_DENSITY * Math.PI * Math.Pow(BALL_RADIUS, 2)
                         * Velocity.LengthSquared());
@@ -74,17 +79,36 @@ namespace Simulator.PhysicalModeling
             }
             else
             {
-                if (boundingSphere.Intersects(robotBox) && Velocity.Length() <= robotVelocity.Length())
+                pitch += (Velocity.Z / BALL_RADIUS) * dt;
+                roll += (Velocity.X / BALL_RADIUS) * dt;
+
+                if (boundingSphere.Intersects(robotBox))
                 {
-                    Velocity += robotVelocity / 4;
-                    robotIntersection = true;
+                    float? x = robotBox.Intersects(new Ray(Position * FieldConstants.PIXELS_IN_ONE_METER, Velocity));
+                    //velocity direction towards the robot
+                    if (x != null)
+                    {
+                        Velocity = -Velocity;
+                    }
+                    //ball velocity in the direction outside of the robot
+                    else if (Velocity.Length() < robotVelocity.Length())
+                    {
+                        Velocity = robotVelocity;
+                        robotIntersection = true;
+
+                        //sphere.Rotation = sphere.Rotation * Matrix.CreateFromAxisAngle(Vector3.Transform(Velocity, Matrix.CreateRotationY(MathHelper.PiOver2)), (Velocity.Length() / (2 * BALL_RADIUS)) * dt);
+                    }
                 }
                 else
                 {
                     if (Velocity.Length() < 0.03f)
                         Velocity = Vector3.Zero;
                     else
-                        Velocity -= Vector3.Normalize(Velocity) * dt * 1f; //-0.2 m/s^2 acceleration
+                    {
+                        Velocity -= Vector3.Normalize(Velocity) * dt * 0.7f; //-0.7 m/s^2 acceleration
+
+                        
+                    }
                 }
             }
 
@@ -102,8 +126,8 @@ namespace Simulator.PhysicalModeling
                 if (ballFront.Y > FieldConstants.C * FieldConstants.HEIGHT_ABOVE_CARPET ||
                     ballFront.Y < FieldConstants.C * FieldConstants.HIGH_GOAL_BOTTOM_ABOVE_CARPET ||
                     (ballFront.X > 11.5f * FieldConstants.C && ballFront.X < 12.9f * FieldConstants.C))
-                        Velocity -= new Vector3(Velocity.X / 10, Velocity.Y / 10, 1.8f * Velocity.Z);
-                
+                    Velocity -= new Vector3(Velocity.X / 10, Velocity.Y / 10, 1.8f * Velocity.Z);
+
 
 
                 if (boundingSphere.Center.Z < 0 || boundingSphere.Center.Z > FieldConstants.C * FieldConstants.HEIGHT)
@@ -115,7 +139,7 @@ namespace Simulator.PhysicalModeling
                     if (ballBack.Z < 0 || ballBack.Z > FieldConstants.C * FieldConstants.HEIGHT)
                         disappear = true;
                 }
-                    
+
             }
             else if (ballFront.Y < 0)
             {
@@ -135,21 +159,25 @@ namespace Simulator.PhysicalModeling
                 ballPossessed = true;
 
             RelativePosition += Velocity * dt;
+
+            
+            sphere.Rotation = Quaternion.CreateFromYawPitchRoll(0, pitch, roll);
         }
 
         public void PutOnRobot()
         {
             ballPossessed = true;
+            sphere.Rotation = Quaternion.Identity;
         }
 
-        //TODO: add robot velocity also!
-        public void ShootBall(float robotOrientation)
+
+        public void ShootBall(float robotOrientation, Vector3 robotVelocity)
         {
             if (ballPossessed)
             {
                 Vector3 direction = new Vector3(0, 1, 1); //45 degrees shooting
                 direction = Vector3.Transform(direction, Matrix.CreateRotationY(robotOrientation));
-                Velocity = Vector3.Normalize(direction) * SHOOTING_VELOCITY;
+                Velocity = (Vector3.Normalize(direction) * SHOOTING_VELOCITY) + robotVelocity;
                 ballInAir = true;
                 ballPossessed = false;
             }

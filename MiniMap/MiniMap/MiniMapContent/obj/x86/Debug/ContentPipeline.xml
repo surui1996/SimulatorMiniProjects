@@ -29,15 +29,6 @@
       <Time>2014-06-04T13:45:22.236403+03:00</Time>
     </Item>
     <Item>
-      <Source>visionRed.jpg</Source>
-      <Name>visionRed</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\visionRed.xnb</Output>
-      <Time>2014-04-18T23:24:34.9218591+03:00</Time>
-    </Item>
-    <Item>
       <Source>carpet3D.png</Source>
       <Name>carpet3D</Name>
       <Importer>TextureImporter</Importer>
@@ -80,7 +71,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\greenBox.xnb</Output>
-      <Time>2014-04-25T14:18:20.532869+03:00</Time>
+      <Time>2014-06-20T18:46:45.691942+03:00</Time>
     </Item>
     <Item>
       <Source>boundryGrey.png</Source>
@@ -137,13 +128,121 @@
       <Time>2014-06-05T15:22:12.5253455+03:00</Time>
     </Item>
     <Item>
-      <Source>Copy of ballLogo.jpg</Source>
-      <Name>Copy of ballLogo</Name>
+      <Source>visionRed.png</Source>
+      <Name>visionRed</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\Copy of ballLogo.xnb</Output>
-      <Time>2014-06-18T08:27:04.8611494+03:00</Time>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\visionRed.xnb</Output>
+      <Time>2014-06-20T20:44:16.5423363+03:00</Time>
+    </Item>
+    <Item>
+      <Source>labelFont.spritefont</Source>
+      <Name>labelFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\labelFont.xnb</Output>
+      <Time>2014-06-21T16:13:37.4164591+03:00</Time>
+    </Item>
+    <Item>
+      <Source>DashboardBackground.png</Source>
+      <Name>DashboardBackground</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\DashboardBackground.xnb</Output>
+      <Time>2014-06-23T12:07:27.6766106+03:00</Time>
+    </Item>
+    <Item>
+      <Source>boldFont.spritefont</Source>
+      <Name>boldFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\boldFont.xnb</Output>
+      <Time>2014-06-23T12:30:46.0502883+03:00</Time>
+    </Item>
+    <Item>
+      <Source>drivers.jpg</Source>
+      <Name>drivers</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\drivers.xnb</Output>
+      <Time>2014-06-23T13:59:29.7363098+03:00</Time>
+    </Item>
+    <Item>
+      <Source>drivers2.jpg</Source>
+      <Name>drivers2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\drivers2.xnb</Output>
+      <Time>2014-06-23T13:59:37.5216137+03:00</Time>
+    </Item>
+    <Item>
+      <Source>programmer.jpg</Source>
+      <Name>programmer</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\programmer.xnb</Output>
+      <Time>2014-06-23T13:46:10.6590176+03:00</Time>
+    </Item>
+    <Item>
+      <Source>programmer2.jpg</Source>
+      <Name>programmer2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\programmer2.xnb</Output>
+      <Time>2014-06-23T13:47:36.1237132+03:00</Time>
+    </Item>
+    <Item>
+      <Source>match.jpg</Source>
+      <Name>match</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\match.xnb</Output>
+      <Time>2014-06-23T13:55:53.6589404+03:00</Time>
+    </Item>
+    <Item>
+      <Source>match2.jpg</Source>
+      <Name>match2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\match2.xnb</Output>
+      <Time>2014-06-23T13:52:44.3045092+03:00</Time>
+    </Item>
+    <Item>
+      <Source>exit.jpg</Source>
+      <Name>exit</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\exit.xnb</Output>
+      <Time>2014-06-23T13:58:24.7045941+03:00</Time>
+    </Item>
+    <Item>
+      <Source>exit2.jpg</Source>
+      <Name>exit2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\exit2.xnb</Output>
+      <Time>2014-06-23T13:58:31.4883036+03:00</Time>
+    </Item>
+    <Item>
+      <Source>blackBox.png</Source>
+      <Name>blackBox</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\blackBox.xnb</Output>
+      <Time>2014-06-23T14:26:08.3070827+03:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

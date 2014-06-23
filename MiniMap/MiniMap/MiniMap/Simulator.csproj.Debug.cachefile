@@ -1,7 +1,6 @@
 Content\carpet.xnb
 Content\chassis.xnb
 Content\visionBlue.xnb
-Content\visionRed.xnb
 Content\carpet3D.xnb
 Content\truss.xnb
 Content\innerWheel.xnb
@@ -13,4 +12,16 @@ Content\ballLogo.xnb
 Content\wallBlue.xnb
 Content\goalFrame.xnb
 Content\trussVertical.xnb
-Content\Copy of ballLogo.xnb
+Content\visionRed.xnb
+Content\labelFont.xnb
+Content\DashboardBackground.xnb
+Content\boldFont.xnb
+Content\drivers.xnb
+Content\drivers2.xnb
+Content\programmer.xnb
+Content\programmer2.xnb
+Content\match.xnb
+Content\match2.xnb
+Content\exit.xnb
+Content\exit2.xnb
+Content\blackBox.xnb

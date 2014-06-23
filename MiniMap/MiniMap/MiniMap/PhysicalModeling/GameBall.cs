@@ -23,7 +23,7 @@ namespace Simulator.PhysicalModeling
         private bool ballPossessed = false, ballInAir = false, disappear = false;
 
         private Sphere sphere;
-        private float pitch = 0, roll = 0;
+        private float yaw = 0, pitch = 0, roll = 0;
 
         public GameBall(Vector3 position3D, Vector2 mapPosition, float mapMetersToPixel,
             Texture2D ball2D, Texture2D ballCover)
@@ -49,10 +49,13 @@ namespace Simulator.PhysicalModeling
             ballPossessed = false; ballInAir = false; disappear = false;
         }
 
-        public void Update(float dt, BoundingSphere robotBox, Vector3 robotVelocity)
+        public void Update(float dt, BoundingSphere robotBox, Vector3 robotVelocity, float angularVelocity)
         {
             if (ballPossessed)
             {
+                yaw += angularVelocity * dt;
+                sphere.Rotation = Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll);
+
                 RelativePosition = (robotBox.Center - initialPositionOn3D) / FieldConstants.PIXELS_IN_ONE_METER;
                 Velocity = Vector3.Zero;
                 return;
@@ -62,11 +65,13 @@ namespace Simulator.PhysicalModeling
             BoundingSphere boundingSphere = new BoundingSphere(initialPositionOn3D + RelativePosition * FieldConstants.PIXELS_IN_ONE_METER,
                     BALL_RADIUS * FieldConstants.PIXELS_IN_ONE_METER);
 
+             if (boundingSphere.Intersects(robotBox))
+                    robotIntersection = true;
+
+
+            //velocity update
             if (ballInAir)
             {
-                pitch += (Velocity.Z / BALL_RADIUS) * dt / ROTATE_RESISTANCE;
-                roll += (Velocity.X / BALL_RADIUS) * dt / ROTATE_RESISTANCE;
-
                 //Fdrag = 0.5*Cdrag*Density*cross-sectionalArea*v^2, Adrag = fDrag / ballMass
                 float dragForceMagnitude = (float)(0.5 * DRAG_COEFF * AIR_DENSITY * Math.PI * Math.Pow(BALL_RADIUS, 2)
                         * Velocity.LengthSquared());
@@ -79,39 +84,33 @@ namespace Simulator.PhysicalModeling
             }
             else
             {
-                pitch += (Velocity.Z / BALL_RADIUS) * dt;
-                roll += (Velocity.X / BALL_RADIUS) * dt;
-
-                if (boundingSphere.Intersects(robotBox))
+                if (robotIntersection)
                 {
-                    float? x = robotBox.Intersects(new Ray(Position * FieldConstants.PIXELS_IN_ONE_METER, Velocity));
                     //velocity direction towards the robot
-                    if (x != null)
-                    {
-                        Velocity = -Velocity;
-                    }
-                    //ball velocity in the direction outside of the robot
-                    else if (Velocity.Length() < robotVelocity.Length())
-                    {
-                        Velocity = robotVelocity;
-                        robotIntersection = true;
+                    if (robotBox.Intersects(new Ray(Position * FieldConstants.PIXELS_IN_ONE_METER, Velocity)) != null)
+                        Velocity = -0.5f * Velocity;
 
-                        //sphere.Rotation = sphere.Rotation * Matrix.CreateFromAxisAngle(Vector3.Transform(Velocity, Matrix.CreateRotationY(MathHelper.PiOver2)), (Velocity.Length() / (2 * BALL_RADIUS)) * dt);
-                    }
+                    //ball velocity in the direction outside of the robot
+                    if (Velocity.Length() < robotVelocity.Length())
+                        Velocity = robotVelocity;
                 }
                 else
                 {
                     if (Velocity.Length() < 0.03f)
                         Velocity = Vector3.Zero;
                     else
-                    {
-                        Velocity -= Vector3.Normalize(Velocity) * dt * 0.7f; //-0.7 m/s^2 acceleration
-
-                        
-                    }
+                        Velocity -= Vector3.Normalize(Velocity) * dt * 1.5f; //-1.5 m/s^2 acceleration
                 }
             }
 
+            
+
+            //ball rotation
+            pitch += (Velocity.Z / BALL_RADIUS) * dt / ROTATE_RESISTANCE;
+            roll += (Velocity.X / BALL_RADIUS) * dt / ROTATE_RESISTANCE;
+            sphere.Rotation = Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll);
+
+            //intersections
             Vector3 ballFront = boundingSphere.Center + Vector3.Normalize(Velocity) * boundingSphere.Radius;
 
             if (ballFront.X < 0 || ballFront.X > FieldConstants.C * FieldConstants.WIDTH)
@@ -127,8 +126,6 @@ namespace Simulator.PhysicalModeling
                     ballFront.Y < FieldConstants.C * FieldConstants.HIGH_GOAL_BOTTOM_ABOVE_CARPET ||
                     (ballFront.X > 11.5f * FieldConstants.C && ballFront.X < 12.9f * FieldConstants.C))
                     Velocity -= new Vector3(Velocity.X / 10, Velocity.Y / 10, 1.8f * Velocity.Z);
-
-
 
                 if (boundingSphere.Center.Z < 0 || boundingSphere.Center.Z > FieldConstants.C * FieldConstants.HEIGHT)
                     IsScored = true;
@@ -155,21 +152,28 @@ namespace Simulator.PhysicalModeling
                 }
             }
 
+
+
             if (wallIntersection && robotIntersection)
                 ballPossessed = true;
 
             RelativePosition += Velocity * dt;
-
-            
-            sphere.Rotation = Quaternion.CreateFromYawPitchRoll(0, pitch, roll);
         }
 
         public void PutOnRobot()
         {
             ballPossessed = true;
-            sphere.Rotation = Quaternion.Identity;
         }
 
+        public void ChangeSphereTexture(Texture2D newTexture)
+        {
+            sphere.Texture = newTexture;
+        }
+
+        public void Rotate(float yaw, float pitch, float roll)
+        {
+            sphere.Rotation = Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll);
+        }
 
         public void ShootBall(float robotOrientation, Vector3 robotVelocity)
         {

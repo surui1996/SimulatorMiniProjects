@@ -115,7 +115,17 @@
     <Compile Include="Animation3D\Cylinder.cs" />
     <Compile Include="Animation3D\Drawable3D.cs" />
     <Compile Include="Animation3D\Field.cs" />
+    <Compile Include="GUI\BallMenuEntry.cs" />
+    <Compile Include="GUI\GameScreen.cs" />
+    <Compile Include="GUI\HeadedLabel.cs" />
+    <Compile Include="GUI\Label.cs" />
+    <Compile Include="GUI\LineBatch.cs" />
+    <Compile Include="GUI\ScreenManager.cs" />
+    <Compile Include="GUI\Timer.cs" />
+    <Compile Include="GUI\UpdatingList.cs" />
     <Compile Include="Helpers\FieldConstants.cs" />
+    <Compile Include="Main\DriversGame.cs" />
+    <Compile Include="Main\MainMenu.cs" />
     <Compile Include="PhysicalModeling\DynamicObject.cs" />
     <Compile Include="PhysicalModeling\GameBall.cs" />
     <Compile Include="Animation3D\HollowCylinder.cs" />

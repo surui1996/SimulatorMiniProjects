@@ -22,6 +22,8 @@ namespace Simulator.PhysicalModeling
         public float Orientation { get; set; }
         public float CameraOrientation { get; set; }
 
+        public float AngularVelocity { get; set; }
+
         //in map-pixels coordinate system
         private Vector2 cornerFrontLeft;
         private Vector2 cornerFrontRight;
@@ -62,6 +64,7 @@ namespace Simulator.PhysicalModeling
             float c = FieldConstants.PIXELS_IN_ONE_METER;
             wheeledBox = new WheeledBox(body, wheelSide, wheelCircumference, CHASSIS_LENGTH * c,
                 CHASSIS_WIDTH * c, WHEEL_RADIUS * c);
+            
         }
 
         public void Update(float dt) //dt = timeSinceLastUpdate
@@ -76,11 +79,14 @@ namespace Simulator.PhysicalModeling
 
             float velocity = (vR + vL) / 2;
             float angularVelocity = (vR - vL) / CHASSIS_WIDTH;
+            angularVelocity /= 6f; //because of friction
 
             if (velocityLeftZero || velocityRightZero)
                 angularVelocity *= 2;
 
             Velocity = Vector3.Transform(Vector3.UnitZ * velocity, Matrix.CreateRotationY(Orientation));
+            AngularVelocity = angularVelocity;
+            
             RelativePosition += Velocity * dt;
             Orientation += angularVelocity * dt;
 
@@ -168,7 +174,7 @@ namespace Simulator.PhysicalModeling
             float rightMotorOutput;
 
             forward = Limit(forward);
-            curve = Limit(curve);
+            curve = -Limit(curve);
 
 
             if (forward > 0.0)

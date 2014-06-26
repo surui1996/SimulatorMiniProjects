@@ -8,16 +8,14 @@ using Simulator.Animation3D;
 using Simulator.PhysicalModeling;
 using Microsoft.Xna.Framework.Input;
 using Simulator.GUI;
+using Microsoft.Xna.Framework.Content;
 
 namespace Simulator.Main
 {
     enum GameMode { Drivers = 0, Programmer = 1, Match = 2, Exit = 3 }
 
-    class MainMenu : Microsoft.Xna.Framework.Game
+    class MainMenu : GameScreen
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-
         // Content
         BasicEffect effect3D, effectWithLighting;
         Field field;
@@ -35,7 +33,9 @@ namespace Simulator.Main
         static float viewAngle = MathHelper.PiOver4;
 
         Matrix view;
-        Vector3 cameraPosition;
+        Vector3 cameraPosition, cameraTarget;
+        float cameraSpeed = 2f;
+        bool moveCamera;
 
         Viewport defaultViewport;
 
@@ -43,58 +43,46 @@ namespace Simulator.Main
         static float nearClip = 10.0f;
         static float farClip = 1000.0f;
 
-        public static KeyboardState newState, oldState;
+        public static KeyboardState oldState;
 
-        public MainMenu()
+        public MainMenu(bool moveCamera)
         {
-            graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            this.moveCamera = moveCamera;
+            if (moveCamera)
+                cameraPosition = FieldConstants.C * new Vector3(-FieldConstants.WIDTH / 3f, FieldConstants.TRUSS_HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 7f);
+            else
+                cameraPosition = FieldConstants.C * new Vector3(FieldConstants.WIDTH / 2f, FieldConstants.TRUSS_HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 4.5f);
+            cameraTarget = FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 2 * FieldConstants.TRUSS_HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT);
+            view = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
 
-            graphics.PreferredBackBufferWidth = (int)(1366 / 1.5);
-            graphics.PreferredBackBufferHeight = (int)(768 / 1.5);
-            //graphics.IsFullScreen = true;
-
-            cameraPosition = FieldConstants.C * new Vector3(FieldConstants.WIDTH / 2, FieldConstants.TRUSS_HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 4.5f);
-            view = Matrix.CreateLookAt(cameraPosition,
-            FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 2* FieldConstants.TRUSS_HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT), Vector3.Up);
-        }
-
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
-        {
-            base.Initialize();
+            TransitionOnTime = TimeSpan.FromSeconds(1);
+            TransitionOffTime = TimeSpan.FromSeconds(0.5);
         }
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
-        protected override void LoadContent()
+        public override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            base.LoadContent();
 
-            Texture2D innerWheel =  Content.Load<Texture2D>("innerWheel");
-            Texture2D plaction =  Content.Load<Texture2D>("plaction");
-            Texture2D blackBox =  Content.Load<Texture2D>("blackBox");
-            Texture2D greenBox =  Content.Load<Texture2D>("greenBox");
+            Texture2D innerWheel = Content.Load<Texture2D>("innerWheel");
+            Texture2D plaction = Content.Load<Texture2D>("plaction");
+            Texture2D blackBox = Content.Load<Texture2D>("blackBox");
+            Texture2D greenBox = Content.Load<Texture2D>("greenBox");
             Texture2D ballLogo = Content.Load<Texture2D>("ballLogo");
 
             robots = new List<Robot>();
             for (int i = 0; i < 3; i++)
                 robots.Add(new Robot(FieldConstants.C * new Vector3(FieldConstants.WIDTH * (i + 1) / 4,
-                0, FieldConstants.HEIGHT * 0.6f),
-                Vector2.Zero, 0, i % 2 == 0 ? blackBox : greenBox, innerWheel, plaction, null));
+                0, FieldConstants.HEIGHT * 0.6f), 0, 0,
+                i % 2 == 0 ? blackBox : greenBox, innerWheel, plaction, null));
             for (int i = 0; i < 3; i++)
             {
                 Robot r = new Robot(FieldConstants.C * new Vector3(FieldConstants.WIDTH * (i + 1) / 4,
-                0, FieldConstants.HEIGHT * 0.37f),
-                Vector2.Zero, 0, i % 2 == 0 ? greenBox : blackBox, innerWheel, plaction, null);
+                0, FieldConstants.HEIGHT * 0.37f), 0, 0,
+                i % 2 == 0 ? greenBox : blackBox, innerWheel, plaction, null);
                 r.Orientation += MathHelper.Pi;
                 robots.Add(r);
             }
@@ -102,7 +90,7 @@ namespace Simulator.Main
             balls = new List<GameBall>();
             for (int i = 0; i < 6; i++)
             {
-                balls.Add(new GameBall(Vector3.Zero, Vector2.Zero, 0, null, ballLogo));
+                balls.Add(new GameBall(Vector3.Zero, 0, null, ballLogo));
                 balls[i].PutOnRobot();
             }
 
@@ -145,54 +133,65 @@ namespace Simulator.Main
             effectWithLighting.EnableDefaultLighting();
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-            Content.Unload();
-        }
-
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime, KeyboardState state)
         {
-            newState = Keyboard.GetState();
+            base.Update(gameTime, state);
+
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            for (int i = 0; i < 6; i++)
+                balls[i].Update(dt, robots[i].GetBoundingSphere(),
+                    robots[i].Velocity, robots[i].AngularVelocity);
+
+            foreach (BallMenuEntry entry in entries)
+                entry.Update(dt);
+
+            if (moveCamera && cameraPosition.X < FieldConstants.C * FieldConstants.WIDTH / 2)
+            {
+                cameraPosition.X += cameraSpeed;
+                cameraPosition.Z = 0.005f * cameraPosition.X * cameraPosition.X;
+                return;
+            }                
+            
+            if (this.IsExiting)
+                return;
 
             int lastIndex = selectionIndex;
-
-            // Allows the game to exit
-            if (newState.IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-            {
-                this.Exit();
-                return;
-            }
-            else if (newState.IsKeyDown(Keys.Enter))
-            {
-                GameMode mode = (GameMode)selectionIndex;
-                switch (mode)
-                {
-                    case GameMode.Drivers: Components.Add(new DriversGame() as IGameComponent);
-                        break;
-                    case GameMode.Programmer: Components.Add(new DriversGame() as IGameComponent);
-                        break;
-                    case GameMode.Match: Components.Add(new DriversGame() as IGameComponent);
-                        break;
-                    case GameMode.Exit: this.Exit();
-                        break;
-                }
-                Components.Remove(this as IGameComponent);
-                return;
-            }
-
             
-            if (newState.IsKeyDown(Keys.Right))
+            if (state.IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            {
+                ScreenManager.Exit();
+                return;
+            }
+            else if (state.IsKeyDown(Keys.Enter))
+            {
+                if (!oldState.IsKeyDown(Keys.Enter))
+                {
+                    GameMode mode = (GameMode)selectionIndex;
+                    switch (mode)
+                    {
+                        case GameMode.Drivers: ExitScreen(); ScreenManager.AddScreen(new DriversGame());
+                            break;
+                        case GameMode.Programmer: ExitScreen(); ScreenManager.AddScreen(new SimulatorGame(false));
+                            break;
+                        case GameMode.Match: ExitScreen(); ScreenManager.AddScreen(new SimulatorGame(true));
+                            break;
+                        case GameMode.Exit: ScreenManager.Exit();
+                            break;
+                    }
+                    ScreenManager.Game.ResetElapsedTime();
+                    return;
+                }
+            }
+
+
+            if (state.IsKeyDown(Keys.Right))
             {
                 // key Right has just been pressed.
                 if (!oldState.IsKeyDown(Keys.Right))
@@ -203,7 +202,7 @@ namespace Simulator.Main
                 }
             }
 
-            if (newState.IsKeyDown(Keys.Left))
+            if (state.IsKeyDown(Keys.Left))
             {
                 // key Right has just been pressed.
                 if (!oldState.IsKeyDown(Keys.Left))
@@ -220,35 +219,20 @@ namespace Simulator.Main
                 entries[lastIndex].UnSelect();
             }
 
-            oldState = newState;
-
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            foreach (BallMenuEntry entry in entries)
-                entry.Update(dt);
-
-            for (int i = 0; i < 6; i++)
-                balls[i].Update(dt, robots[i].GetBoundingSphere(),
-                    robots[i].Velocity, robots[i].AngularVelocity);
-                
-
-            //robot.TankDrive(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y, GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y);
-            //robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            //ball.Update((float)gameTime.ElapsedGameTime.TotalSeconds, robot.GetBoundingSphere(), robot.Velocity, robot.AngularVelocity);
-
-            base.Update(gameTime);
+            oldState = state;
         }
 
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             //spritebatch enables cull mode, and disable depth calculations
             Restore3DSettings();
+            view = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
             effect3D.View = view;
             effectWithLighting.View = effect3D.View;
 
@@ -263,18 +247,14 @@ namespace Simulator.Main
 
             field.Draw(GraphicsDevice, effect3D);
 
-            spriteBatch.Begin();
-
-            spriteBatch.End();
-
-            base.Draw(gameTime);
+            ScreenManager.FadeBackBufferFromColor(TransitionAlpha, Color.Black);
         }
 
-        protected override void OnExiting(Object sender, EventArgs args)
-        {
-            base.OnExiting(sender, args);
-            Environment.Exit(1);
-        }
+        //protected override void OnExiting(Object sender, EventArgs args)
+        //{
+        //    base.OnExiting(sender, args);
+        //    Environment.Exit(1);
+        //}
 
         private void Restore3DSettings()
         {

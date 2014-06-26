@@ -9,6 +9,7 @@ class RobotClient(Thread):
 		
         self.isUp = False
         self.stop = False
+        self.kill = False
         self.GameState = "TELEOP"
 		
         self.robotValues = {}
@@ -20,6 +21,7 @@ class RobotClient(Thread):
         self.robotValues["Gyro"] = 0.0
         
         self.keyboard = {}
+        self.xkeyboard = {}
         
         self.ballPossessed = False
         #self.robotValues["Accelerometer"] = 0.0
@@ -41,7 +43,7 @@ class RobotClient(Thread):
                     if msg != "":
                         self.ParseMessage(msg)
             
-            if self.stop == True:
+            if self.kill:
                 break
                 
             time.sleep(0.005)
@@ -52,7 +54,10 @@ class RobotClient(Thread):
         self.SendGetRequest("EncoderRight")
     
     def ParseMessage(self, message):
-        if message.find("KEY") != -1:
+        if message.find("XKEY") != -1:
+            s = message.split("XKEY ")[1].split("=")
+            self.xkeyboard[s[0]] = (s[1] == "True");
+        elif message.find("KEY") != -1:
             s = message.split("KEY ")[1].split("=")
             self.keyboard[s[0]] = (s[1] == "True");
         elif message.find("=") != -1:
@@ -63,6 +68,10 @@ class RobotClient(Thread):
             self.ballPossessed = (message.split(" ")[1] == "True");
         elif message.find("STOP") != -1:
             self.stop = True
+        elif message.find("START") != -1:
+            self.stop = False
+        elif message.find("KILL") != -1:
+            self.kill = True
     
     def SetInDictionary(self, response):
         s = response.split("=")
@@ -79,21 +88,30 @@ class RobotClient(Thread):
         self.robotValues["RightOutput"] = right
         set = "TANK " + str(left) + "," + str(right) + ";"
         self.client.send(set)
-			
+        
     def SendArcadeDriveRequest(self, forward, rotate):
         set = "ARCADE " + str(forward) + "," + str(rotate) + ";"
+        self.client.send(set)
+     
+    def SendJoystickTankDriveRequest(self):
+        set = "TANK;"
+        self.client.send(set)
+     
+    def SendJoystickArcadeDriveRequest(self):
+        set = "ARCADE;"
         self.client.send(set)
     
     #"ENCODERS" / "GYRO"
     def SendResetMessage(self, reset):
-        set = "RESET " + reset + ";"
-        self.client.send(set)
-        
         if reset == "ENCODERS":
             self.robotValues["EncoderLeft"] = 0.0
             self.robotValues["EncoderRight"] = 0.0
         elif reset == "GYRO":
             self.robotValues["Gyro"] = 0.0
+    
+        set = "RESET " + reset + ";"
+        self.client.send(set)
+        
 
     def IsPressed(self, keyString):
         if keyString not in self.keyboard:
@@ -101,6 +119,13 @@ class RobotClient(Thread):
         msg = "KEY " + keyString + ";"
         self.client.send(msg)
         return self.keyboard[keyString]
+        
+    def IsXPressed(self, keyString):
+        if keyString not in self.xkeyboard:
+            self.xkeyboard[keyString] = False
+        msg = "XKEY " + keyString + ";"
+        self.client.send(msg)
+        return self.xkeyboard[keyString]
     
     def TryToPossess(self):
         self.client.send("POSSESS;")

@@ -15,17 +15,15 @@ using Simulator.Animation3D;
 using Simulator.PhysicalModeling;
 using Simulator.PythonCommunication;
 using Simulator.GUI;
+using Simulator.Helpers;
 
 namespace Simulator.Main
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class DriversGame : Microsoft.Xna.Framework.Game
+    class DriversGame : GameScreen
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-
         Texture2D map;
 
         // Content
@@ -36,7 +34,6 @@ namespace Simulator.Main
 
         Label score;
         Timer timer;
-        HeadedLabel gyro, encoders;
 
         Matrix proj;
 
@@ -48,35 +45,25 @@ namespace Simulator.Main
         static float viewAngle = MathHelper.PiOver4;
 
         Matrix view1, view2, view3, view4;
-        Viewport defaultViewport, vp1, vp2, vp3, vp4;
+        Viewport defaultViewport, vpMap, vp1, vp2, vp3, vp4;
         Dictionary<Viewport, Matrix> viewDictionary;
         bool fourViews = false;
 
+        int width, height;
 
         // Set distance from the camera of the near and far clipping planes.
         static float nearClip = 10.0f;
         static float farClip = 1000.0f;
 
-        private const int MiniMapLong = 741 / 3;
-        private const int MiniMapShort = 335 / 3;
+        private int MiniMapLong = GameConstants.MINI_MAP_LONG;
+        private int MiniMapShort = GameConstants.MINI_MAP_SHORT;
 
-        public static KeyboardState keyboardState;
-
-        float metersToPixel;
+        float metersToPixel, ratioCurrentToFullScreen;
 
         bool movingCamera = true;
 
         public DriversGame()
         {
-            graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-
-            
-            graphics.PreferredBackBufferWidth = (int)(1366 / 1.5);
-            graphics.PreferredBackBufferHeight = (int)(768 / 1.5);
-            //graphics.IsFullScreen = true;
-            metersToPixel = MiniMapLong / FieldConstants.HEIGHT_IN_METERS;
-
             Vector3 cameraPosition1 = FieldConstants.C * new Vector3(-FieldConstants.WIDTH * 1.2f, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT / 2);
             Vector3 cameraPosition2 = FieldConstants.C * new Vector3(0, FieldConstants.HEIGHT_ABOVE_CARPET, FieldConstants.HEIGHT);
             Vector3 cameraPosition3 = FieldConstants.C * new Vector3(FieldConstants.WIDTH, FieldConstants.HEIGHT_ABOVE_CARPET, 0);
@@ -92,35 +79,38 @@ namespace Simulator.Main
             FieldConstants.C * 0.5f * new Vector3(FieldConstants.WIDTH, 0, FieldConstants.HEIGHT), Vector3.Up);
 
             viewDictionary = new Dictionary<Viewport, Matrix>();
-        }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
-        {
-            base.Initialize();
+            TransitionOnTime = TimeSpan.FromSeconds(0.5);
+            TransitionOffTime = TimeSpan.FromSeconds(0.5);
         }
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
-        protected override void LoadContent()
+        public override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            base.LoadContent();
 
+
+            width = ScreenManager.Game.Window.ClientBounds.Width;
+            height = ScreenManager.Game.Window.ClientBounds.Height;
+
+            ratioCurrentToFullScreen = (((float)width / GameConstants.RESOLUTION_X) +
+                ((float)height / GameConstants.RESOLUTION_Y)) / 2;
+
+            MiniMapLong = (int)(MiniMapLong * ratioCurrentToFullScreen);
+            MiniMapShort = (int)(MiniMapShort * ratioCurrentToFullScreen);
+
+            metersToPixel = MiniMapLong / FieldConstants.HEIGHT_IN_METERS;
+
+            
             LineBatch.Init(GraphicsDevice);
 
             map = Content.Load<Texture2D>("carpet");
             robot = new Robot(FieldConstants.C * new Vector3(FieldConstants.WIDTH / 2,
                 0, FieldConstants.HEIGHT / 2),
-                new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2f),
-                graphics.PreferredBackBufferHeight - (MiniMapShort / 2f)), metersToPixel,
+                 metersToPixel, MiniMapShort,
                  Content.Load<Texture2D>("greenBox"),
                  Content.Load<Texture2D>("innerWheel"),
                  Content.Load<Texture2D>("plaction"),
@@ -128,26 +118,22 @@ namespace Simulator.Main
 
             ball = new GameBall(FieldConstants.C * new Vector3(FieldConstants.WIDTH / 4,
                 0, FieldConstants.HEIGHT / 2),
-                new Vector2(graphics.PreferredBackBufferWidth - (MiniMapLong / 2),
-                graphics.PreferredBackBufferHeight - (MiniMapShort / 4)), metersToPixel,
+                metersToPixel,
                 Content.Load<Texture2D>("greenBall"), Content.Load<Texture2D>("ballLogo"));
 
             field = new Field(Content);
 
-            score = new Label("0", new Vector2(graphics.PreferredBackBufferWidth * 0.95f, 0),
-                0.7f, Color.Yellow, Content.Load<SpriteFont>("labelFont"));
+            score = new Label("0", new Vector2(width * 0.95f, 0),
+                ratioCurrentToFullScreen, Color.Yellow, Content.Load<SpriteFont>("labelFont"));
 
-            timer = new Timer("0", new Vector2(graphics.PreferredBackBufferWidth * 0.07f, 0),
-                0.7f, Color.Yellow, Content.Load<SpriteFont>("labelFont"));
+            timer = new Timer("0", new Vector2(width * 0.07f, 0),
+                ratioCurrentToFullScreen, Color.Yellow, Content.Load<SpriteFont>("labelFont"));
 
-            gyro = new HeadedLabel("Gyro", "0", new Vector2(graphics.PreferredBackBufferWidth * 0.05f, graphics.PreferredBackBufferHeight * 0.85f),
-                0.3f, Color.Yellow, Content.Load<SpriteFont>("labelFont"));
-
-            encoders = new HeadedLabel("Encoders", "0", new Vector2(graphics.PreferredBackBufferWidth * 0.2f, graphics.PreferredBackBufferHeight * 0.85f),
-               0.3f, Color.Yellow, Content.Load<SpriteFont>("labelFont"));
 
             //float aspectRatio = GraphicsDevice.Viewport.AspectRatio;// 640/480 
             defaultViewport = GraphicsDevice.Viewport;
+            vpMap = new Viewport(defaultViewport.Width - MiniMapLong, defaultViewport.Height - MiniMapShort,
+                MiniMapLong, MiniMapShort);
             vp1 = new Viewport(0, 0, defaultViewport.Width / 2, defaultViewport.Height / 2);
             vp2 = new Viewport(vp1.Width, 0, vp1.Width, vp1.Height);
             vp3 = new Viewport(0, vp1.Height, vp1.Width, vp1.Height);
@@ -172,80 +158,102 @@ namespace Simulator.Main
             effectWithLighting.EnableDefaultLighting();
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-            Content.Unload();
-        }
 
+        float move = 0, rotate = 0;
+        const float increment = 0.05f;
+        void UpdateRobotPosition()
+        {
+            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y != 0
+                || GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y != 0)
+                return;
+
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            if (keyboardState.IsKeyDown(Keys.Left))
+                rotate = -1;
+            else if (keyboardState.IsKeyDown(Keys.Right))
+                rotate = 1;
+            else
+                rotate = 0;
+
+            if (keyboardState.IsKeyDown(Keys.Up))
+                move = 1;
+            else if (keyboardState.IsKeyDown(Keys.Down))
+                move = -1;
+            else
+                move = 0;
+
+            robot.ArcadeDrive(move, rotate);
+        }
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime, KeyboardState state)
         {
-            keyboardState = Keyboard.GetState();
+            base.Update(gameTime, state);
+
+            if (IsExiting)
+                return;
+
+            state = Keyboard.GetState();
 
             // Allows the game to exit
-            if (keyboardState.IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (state.IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
             {
-                this.Exit();
+                ScreenManager.AddScreen(new PauseMenu());
                 return;
             }
-            else if (keyboardState.IsKeyDown(Keys.D1))
+            else if (state.IsKeyDown(Keys.D1))
             {
                 fourViews = false;
                 movingCamera = false;
                 effect3D.View = view1;
             }
-            else if (keyboardState.IsKeyDown(Keys.D2))
+            else if (state.IsKeyDown(Keys.D2))
             {
                 fourViews = false;
                 movingCamera = false;
                 effect3D.View = view2;
             }
-            else if (keyboardState.IsKeyDown(Keys.D3))
+            else if (state.IsKeyDown(Keys.D3))
             {
                 movingCamera = false;
                 effect3D.View = view3;
             }
-            else if (keyboardState.IsKeyDown(Keys.D4))
+            else if (state.IsKeyDown(Keys.D4))
             {
                 fourViews = false;
                 movingCamera = false;
                 effect3D.View = view4;
             }
-            else if (keyboardState.IsKeyDown(Keys.D5))
+            else if (state.IsKeyDown(Keys.D5))
             {
                 fourViews = false;
                 movingCamera = true;
             }
-            else if (keyboardState.IsKeyDown(Keys.D6))
+            else if (state.IsKeyDown(Keys.D6))
             {
                 fourViews = true;
             }
-            else if (keyboardState.IsKeyDown(Keys.W) || GamePad.GetState(PlayerIndex.One).DPad.Up == ButtonState.Pressed)
+            else if (state.IsKeyDown(Keys.W) || GamePad.GetState(PlayerIndex.One).DPad.Up == ButtonState.Pressed)
             {
                 // Rotate Up
                 robot.CameraOrientation -= rotationSpeed;
             }
-            else if (keyboardState.IsKeyDown(Keys.S) || GamePad.GetState(PlayerIndex.One).DPad.Down == ButtonState.Pressed)
+            else if (state.IsKeyDown(Keys.S) || GamePad.GetState(PlayerIndex.One).DPad.Down == ButtonState.Pressed)
             {
                 // Rotate Down
                 robot.CameraOrientation += rotationSpeed;
             }
-            else if (keyboardState.IsKeyDown(Keys.P) || GamePad.GetState(PlayerIndex.One).Buttons.LeftShoulder == ButtonState.Pressed)
+            else if (state.IsKeyDown(Keys.P) || GamePad.GetState(PlayerIndex.One).Buttons.LeftShoulder == ButtonState.Pressed)
             {
                 if (Math.Abs((robot.Position - ball.Position).Length()) < 1)
                     ball.PutOnRobot();
             }
-            else if (keyboardState.IsKeyDown(Keys.S) || GamePad.GetState(PlayerIndex.One).Buttons.RightShoulder == ButtonState.Pressed)
+            else if (state.IsKeyDown(Keys.Space) || GamePad.GetState(PlayerIndex.One).Buttons.RightShoulder == ButtonState.Pressed)
             {
                 ball.ShootBall(robot.Orientation, robot.Velocity);
             }
@@ -253,24 +261,27 @@ namespace Simulator.Main
             if (ball.IsScored)
             {
                 score.ChangeText(int.Parse(score.Text) + 10);
-                ball.Restore();
+                ball.Restore(robot.Position);
             }
             robot.TankDrive(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y, GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y);
+            UpdateRobotPosition();
+
             robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            ball.Update((float)gameTime.ElapsedGameTime.TotalSeconds, robot.GetBoundingSphere(), robot.Velocity, robot.AngularVelocity);
+            for (float t = 0; t < (float)gameTime.ElapsedGameTime.TotalSeconds; t += 0.001f)
+                ball.Update(0.001f, robot.GetBoundingSphere(), robot.Velocity, robot.AngularVelocity);
+            
 
             timer.Update(gameTime);
-            gyro.ChangeText(robot.GyroAngle);
-            encoders.ChangeText(((robot.EncoderLeft + robot.EncoderRight) / 2f));
 
-            base.Update(gameTime);
+            
         }
+
 
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -280,7 +291,6 @@ namespace Simulator.Main
             if (fourViews)
             {
                 DrawFourViewPorts();
-                GraphicsDevice.Viewport = defaultViewport;
             }
             else
             {
@@ -292,17 +302,21 @@ namespace Simulator.Main
                 robot.Draw(GraphicsDevice, effect3D, effectWithLighting);
                 field.Draw(GraphicsDevice, effect3D);
 
+                GraphicsDevice.Viewport = vpMap;
                 spriteBatch.Begin();
-                spriteBatch.Draw(map, new Rectangle(graphics.PreferredBackBufferWidth - MiniMapLong,
-                    graphics.PreferredBackBufferHeight - MiniMapShort, MiniMapLong, MiniMapShort),
+                spriteBatch.Draw(map, new Rectangle(0, 0, vpMap.Width, vpMap.Height),
                     null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
                 robot.DrawOnMap(spriteBatch);
                 ball.DrawOnMap(spriteBatch);
+                spriteBatch.End();
             }
-
+            GraphicsDevice.Viewport = defaultViewport;
+            spriteBatch.Begin();
+            score.Draw(spriteBatch);
+            timer.Draw(spriteBatch);
             spriteBatch.End();
 
-            base.Draw(gameTime);
+            ScreenManager.FadeBackBufferFromColor(TransitionAlpha, Color.Black);
         }
 
         private void DrawFourViewPorts()
@@ -317,19 +331,13 @@ namespace Simulator.Main
                 robot.Draw(GraphicsDevice, effect3D, effectWithLighting);
                 field.Draw(GraphicsDevice, effect3D);
             }
-
+             GraphicsDevice.Viewport = defaultViewport;
             spriteBatch.Begin();
             LineBatch.DrawLine(spriteBatch, Color.Black, Vector2.UnitX * vp1.Width,
                 new Vector2(vp1.Width, defaultViewport.Height), 5, 1);
             LineBatch.DrawLine(spriteBatch, Color.Black, Vector2.UnitY * vp1.Height,
                 new Vector2(defaultViewport.Width, vp1.Height), 5, 1);
-
-        }
-
-        protected override void OnExiting(Object sender, EventArgs args)
-        {
-            base.OnExiting(sender, args);
-            Environment.Exit(1);
+            spriteBatch.End();
         }
 
         private void Restore3DSettings()

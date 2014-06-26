@@ -34,6 +34,13 @@ namespace Simulator.GUI
             list[0] = s;            
         }
 
+        public void Reset()
+        {
+            for (int i = 0; i < rows; i++)
+                list[i] = null;
+            Text = "";
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < rows; i++)

@@ -18,11 +18,13 @@ namespace Simulator.PythonCommunication
     class RobotServer
     {
         Thread serverThread;
-        Socket server;
+        Socket server, connection;
         Robot robot;
         GameBall ball;
 
         UpdatingList messegesList;
+
+        bool stop = false;
 
         public RobotServer(Robot robot, GameBall ball, UpdatingList list)
         {
@@ -44,26 +46,46 @@ namespace Simulator.PythonCommunication
 
         public void Stop()
         {
-            server.Send(GetBytes("STOP;"));
-            Thread.Sleep(5);
+            connection.Send(GetBytes("KILL;"));
+            connection.Close(5);
+            server.Close();
             serverThread.Abort();
+        }
+
+        public void Pause()
+        {
+            if (!stop)
+            {
+                connection.Send(GetBytes("STOP;"));
+                stop = true;
+            }
+        }
+
+        public void Resume()
+        {
+            if (stop)
+            {
+                connection.Send(GetBytes("START;"));
+                stop = false;
+            }
         }
 
         public void SetState(RobotState state)
         {
-            server.Send(GetBytes("STATE " + state.ToString().ToUpper()));
+            if (connection != null)
+                connection.Send(GetBytes("STATE " + state.ToString().ToUpper()));
         }
 
         private void ListenToClient()
         {
             server.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4590));
             server.Listen(5);
-            server = server.Accept();
+            connection = server.Accept();
 
             while (true)
             {
                 byte[] buffer = new byte[1024];
-                server.Receive(buffer);
+                connection.Receive(buffer);
                 string request = GetString(buffer);
 
                 try
@@ -72,7 +94,7 @@ namespace Simulator.PythonCommunication
                 }
                 catch { }
 
-                Thread.Sleep(5);
+                Thread.Sleep(20);
             }
         }
 
@@ -92,11 +114,11 @@ namespace Simulator.PythonCommunication
 
                         if (SimulatorGame.isXboxKeyPressed(key))
                         {
-                            server.Send(GetBytes("XKEY " + key + "=True;"));
+                            connection.Send(GetBytes("XKEY " + key + "=True;"));
                             messegesList.Add("C#: XKEY " + key + "=True;");
                         }
                         else
-                            server.Send(GetBytes("XKEY " + key + "=False;"));
+                            connection.Send(GetBytes("XKEY " + key + "=False;"));
                     }
                     else if (requests[i].IndexOf("KEY") == 0)
                     {
@@ -106,11 +128,11 @@ namespace Simulator.PythonCommunication
 
                         if (SimulatorGame.keyboardState.IsKeyDown(key))
                         {
-                            server.Send(GetBytes("KEY " + key.ToString() + "=True;"));
+                            connection.Send(GetBytes("KEY " + key.ToString() + "=True;"));
                             messegesList.Add("C#: KEY " + key.ToString() + "=True;");
                         }
                         else
-                            server.Send(GetBytes("KEY " + key.ToString() + "=False;"));
+                            connection.Send(GetBytes("KEY " + key.ToString() + "=False;"));
                     }
                     else if (requests[i].IndexOf("ARCADE") == 0)
                     {
@@ -131,16 +153,16 @@ namespace Simulator.PythonCommunication
                             messegesList.Add("PY: ARCADE " + forward.ToString("0.00") + "," + curve.ToString("0.00") + ";");
                         }
 
-                        server.Send(GetBytes("LeftOutput" + "=" + robot.LeftOutput + ";"));
-                        server.Send(GetBytes("RightOutput" + "=" + robot.RightOutput + ";"));
+                        connection.Send(GetBytes("LeftOutput" + "=" + robot.LeftOutput + ";"));
+                        connection.Send(GetBytes("RightOutput" + "=" + robot.RightOutput + ";"));
                     }
                     else if (requests[i].IndexOf("TANK") == 0)
                     {
                         if (requests[i] == "TANK")
                         {
                             robot.TankDrive(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y, GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y);
-                            server.Send(GetBytes("LeftOutput" + "=" + robot.LeftOutput + ";"));
-                            server.Send(GetBytes("RightOutput" + "=" + robot.RightOutput + ";"));
+                            connection.Send(GetBytes("LeftOutput" + "=" + robot.LeftOutput + ";"));
+                            connection.Send(GetBytes("RightOutput" + "=" + robot.RightOutput + ";"));
                             messegesList.Add("PY: " + requests[i]);
                         }
                         else
@@ -168,11 +190,11 @@ namespace Simulator.PythonCommunication
                         if (Math.Abs((robot.Position - ball.Position).Length()) < 1)
                         {
                             ball.PutOnRobot();
-                            server.Send(GetBytes("POSSESS True;"));
+                            connection.Send(GetBytes("POSSESS True;"));
                             messegesList.Add("C#: POSSESS True;");
                         }
                         else
-                            server.Send(GetBytes("POSSESS False;"));
+                            connection.Send(GetBytes("POSSESS False;"));
                     }
                     else if (requests[i].IndexOf("SHOOT") == 0)
                     {
@@ -189,13 +211,13 @@ namespace Simulator.PythonCommunication
             switch (get)
             {
                 case "EncoderLeft":
-                    server.Send(GetBytes(get + "=" + robot.EncoderLeft + ";"));
+                    connection.Send(GetBytes(get + "=" + robot.EncoderLeft + ";"));
                     break;
                 case "EncoderRight":
-                    server.Send(GetBytes(get + "=" + robot.EncoderRight + ";"));
+                    connection.Send(GetBytes(get + "=" + robot.EncoderRight + ";"));
                     break;
                 case "Gyro":
-                    server.Send(GetBytes(get + "=" + robot.GyroAngle + ";"));
+                    connection.Send(GetBytes(get + "=" + robot.GyroAngle + ";"));
                     break;
             }
 

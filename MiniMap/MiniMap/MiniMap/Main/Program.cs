@@ -10,7 +10,7 @@ namespace Simulator.Main
         /// </summary>
         static void Main(string[] args)
         {
-            using (MainMenu game = new MainMenu())
+            using (Simulator game = new Simulator())
             {
                 game.Run();
             }

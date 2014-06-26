@@ -23,7 +23,7 @@ namespace Simulator.GUI
             DefaultTexture = defaultTexture;
             SelectedTexture = selectedTexture;
 
-            ball = new GameBall(CenterPosition, Vector2.Zero, 0, null, defaultTexture);
+            ball = new GameBall(CenterPosition, 0, null, defaultTexture);
 
         }
 

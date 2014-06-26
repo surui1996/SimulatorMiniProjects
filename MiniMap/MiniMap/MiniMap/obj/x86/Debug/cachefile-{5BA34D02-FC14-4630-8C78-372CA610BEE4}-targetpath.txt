@@ -25,3 +25,4 @@ Content\match2.xnb
 Content\exit.xnb
 Content\exit2.xnb
 Content\blackBox.xnb
+Content\blank.xnb

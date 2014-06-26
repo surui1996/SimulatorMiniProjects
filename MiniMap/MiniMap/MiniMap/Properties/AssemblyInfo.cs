@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MiniMap")]
-[assembly: AssemblyProduct("MiniMap")]
+[assembly: AssemblyTitle("Simulator")]
+[assembly: AssemblyProduct("Simulator")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyCompany("Hewlett-Packard Company")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2014")]
+[assembly: AssemblyCompany("Doron Sivan")]
+[assembly: AssemblyCopyright("Copyright © Doron Sivan 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

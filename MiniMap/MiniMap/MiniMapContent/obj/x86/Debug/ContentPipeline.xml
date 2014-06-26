@@ -244,6 +244,15 @@
       <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\blackBox.xnb</Output>
       <Time>2014-06-23T14:26:08.3070827+03:00</Time>
     </Item>
+    <Item>
+      <Source>blank.jpg</Source>
+      <Name>blank</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\דורון\Documents\GitHub\Simulator\MiniMap\MiniMap\MiniMap\bin\x86\Debug\Content\blank.xnb</Output>
+      <Time>2014-06-24T14:32:32.8743699+03:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

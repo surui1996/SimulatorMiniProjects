@@ -29,7 +29,7 @@ namespace Simulator.Animation3D
                FieldConstants.HEIGHT_ABOVE_CARPET / 10, FieldConstants.HEIGHT,
                Vector3.UnitX * FieldConstants.WIDTH, FieldConstants.C);
 
-            carpet3 = new Box(content.Load<Texture2D>("carpet3D"), FieldConstants.WIDTH, 2 / FieldConstants.C, FieldConstants.HEIGHT,
+            carpet3 = new Box(content.Load<Texture2D>("carpet3D"), FieldConstants.WIDTH, 0.01f / FieldConstants.C, FieldConstants.HEIGHT,
                 Vector3.Zero, FieldConstants.C);
 
             float a = FieldConstants.LOWGOAL_WIDTH;

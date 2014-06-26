@@ -19,7 +19,12 @@ class RobotBase:
         return self.client.GameState == "TELEOP"
 	
     def Wait(self, secs):
-        time.sleep(secs)
+        dt = 0.005
+        waiting = 0
+        while waiting < secs:
+            if not self.client.stop:
+                waiting += dt
+            time.sleep(dt)
     
     def GetGyroAngle(self):
         return self.client.robotValues["Gyro"]
@@ -42,8 +47,17 @@ class RobotBase:
     def TankDrive(self, left, right):
         self.client.SendTankDriveRequest(left, right)	
 	
+    def JoystickArcadeDrive(self):
+        self.client.SendJoystickArcadeDriveRequest()
+		
+    def JoystickTankDrive(self):
+        self.client.SendJoystickTankDriveRequest()
+    
     def IsKeyPressed(self, keyString):
         return self.client.IsPressed(keyString)
+        
+    def IsXKeyPressed(self, keyString):
+        return self.client.IsXPressed(keyString)    
     
     def TryToPossess(self):
         self.client.TryToPossess()
@@ -106,9 +120,10 @@ class SimpleRobot(RobotBase):
                     self.Wait(0.005)
             elif self.IsAutonomous():
                 self.Autonomous()
-                while self.IsAutonomous() and self.IsEnabled():
+                while self.IsAutonomous():
                     self.Wait(0.005)
             elif self.IsOperatorControl():
                 self.OperatorControl()
-                while self.IsOperatorControl() and self.IsEnabled():
+                while self.IsOperatorControl():
                     self.Wait(0.005)
+                    

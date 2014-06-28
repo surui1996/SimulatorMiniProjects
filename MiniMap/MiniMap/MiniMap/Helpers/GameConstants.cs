@@ -13,7 +13,7 @@ namespace Simulator.Helpers
         public const int MINI_MAP_LONG = 741 / 2;
         public const int MINI_MAP_SHORT = 335 / 2;
 
-        public static TimeSpan MATCH_TIME = new TimeSpan(0, 0, 20);
+        public static TimeSpan MATCH_TIME = new TimeSpan(0, 2, 30);
         public static TimeSpan AUTO_TIME = TimeSpan.FromSeconds(10);
     }
 }

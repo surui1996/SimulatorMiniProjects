@@ -24,7 +24,9 @@ namespace Simulator.PythonCommunication
 
         UpdatingList messegesList;
 
-        bool stop = false;
+        public RobotState RobotState { get; set; }
+        public bool KeyboardDrive { get; set; }
+        public bool Paused { get; set; }
 
         public RobotServer(Robot robot, GameBall ball, UpdatingList list)
         {
@@ -37,6 +39,9 @@ namespace Simulator.PythonCommunication
             this.ball = ball;
 
             this.messegesList = list;
+
+            KeyboardDrive = false;
+            Paused = false;
         }
 
         public void Start()
@@ -54,24 +59,26 @@ namespace Simulator.PythonCommunication
 
         public void Pause()
         {
-            if (!stop)
+            if (!Paused)
             {
                 connection.Send(GetBytes("STOP;"));
-                stop = true;
+                Paused = true;
             }
         }
 
         public void Resume()
         {
-            if (stop)
+            if (Paused)
             {
                 connection.Send(GetBytes("START;"));
-                stop = false;
+                Paused = false;
             }
         }
 
         public void SetState(RobotState state)
         {
+            RobotState = state;
+
             if (connection != null)
                 connection.Send(GetBytes("STATE " + state.ToString().ToUpper()));
         }
@@ -136,10 +143,15 @@ namespace Simulator.PythonCommunication
                     }
                     else if (requests[i].IndexOf("ARCADE") == 0)
                     {
-
                         if (requests[i] == "ARCADE")
                         {
                             robot.ArcadeDrive(GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y, GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.X);
+                            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y == 0
+                                && GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y == 0)
+                                KeyboardDrive = true;
+                            else
+                                KeyboardDrive = false;
+                                
                             messegesList.Add("PY: " + requests[i] + ";");
                         }
                         else
@@ -161,6 +173,12 @@ namespace Simulator.PythonCommunication
                         if (requests[i] == "TANK")
                         {
                             robot.TankDrive(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y, GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y);
+                            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y == 0
+                                && GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y == 0)
+                                KeyboardDrive = true;
+                            else
+                                KeyboardDrive = false;
+
                             connection.Send(GetBytes("LeftOutput" + "=" + robot.LeftOutput + ";"));
                             connection.Send(GetBytes("RightOutput" + "=" + robot.RightOutput + ";"));
                             messegesList.Add("PY: " + requests[i]);

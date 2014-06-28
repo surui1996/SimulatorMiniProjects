@@ -64,11 +64,11 @@ namespace Simulator.PhysicalModeling
             ballPossessed = false; ballInAir = true; disappear = false;
         }
 
-        public void Restore(Vector3 Position)
+        public void Restore(Vector3 robotPosition)
         {
             Random random = new Random();
             float z;
-            if (Position.Z < 0.5 * FieldConstants.HEIGHT_IN_METERS)
+            if (robotPosition.Z < 0.5 * FieldConstants.HEIGHT_IN_METERS)
                 z = random.Next(75, 91) / 100f * FieldConstants.HEIGHT_IN_METERS;
             else
                 z = random.Next(9, 25) / 100f * FieldConstants.HEIGHT_IN_METERS;
@@ -81,7 +81,7 @@ namespace Simulator.PhysicalModeling
             ballPossessed = false; ballInAir = true; disappear = false;
         }
 
-        int counter = 0;
+
         public void Update(float dt, BoundingSphere robotBox, Vector3 robotVelocity, float angularVelocity)
         {
             if (ballPossessed)
@@ -160,11 +160,10 @@ namespace Simulator.PhysicalModeling
                 
                 wallIntersection = true;
 
-                if (ballFront.Y > FieldConstants.C * FieldConstants.HEIGHT_ABOVE_CARPET ||
-                    ballFront.Y < FieldConstants.C * FieldConstants.HIGH_GOAL_BOTTOM_ABOVE_CARPET ||
+                if ((Position.Y + BALL_RADIUS * 0.8f) * FieldConstants.PIXELS_IN_ONE_METER > FieldConstants.C * FieldConstants.HEIGHT_ABOVE_CARPET ||
+                    (Position.Y - BALL_RADIUS * 0.8f) * FieldConstants.PIXELS_IN_ONE_METER < FieldConstants.C * FieldConstants.HIGH_GOAL_BOTTOM_ABOVE_CARPET ||
                     (ballFront.X > 11.5f * FieldConstants.C && ballFront.X < 12.9f * FieldConstants.C))
                 {
-                    counter++;
                     Velocity -= new Vector3(Velocity.X / 10, Velocity.Y / 10, 1.8f * Velocity.Z);
                 }
 

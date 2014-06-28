@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using Simulator.PhysicalModeling;
 
 namespace Simulator.Animation3D
 {
@@ -12,6 +13,7 @@ namespace Simulator.Animation3D
     {
         Box wallRed, wallBlue, carpet3, boundryLeft, boundryRight;
         Box lowGoal, truss, trussVertical;
+        static List<Wall> walls;
 
         public Field(ContentManager content)
         {
@@ -22,11 +24,11 @@ namespace Simulator.Animation3D
                 Vector3.Zero, FieldConstants.C);
 
             boundryRight = new Box(content.Load<Texture2D>("boundryGrey"), FieldConstants.WIDTH / 50,
-                FieldConstants.HEIGHT_ABOVE_CARPET / 10, FieldConstants.HEIGHT,
+                FieldConstants.HEIGHT_ABOVE_CARPET / 7, FieldConstants.HEIGHT,
                 -Vector3.UnitX * FieldConstants.WIDTH / 50, FieldConstants.C);
 
             boundryLeft = new Box(content.Load<Texture2D>("boundryGrey"), FieldConstants.WIDTH / 50,
-               FieldConstants.HEIGHT_ABOVE_CARPET / 10, FieldConstants.HEIGHT,
+               FieldConstants.HEIGHT_ABOVE_CARPET / 7, FieldConstants.HEIGHT,
                Vector3.UnitX * FieldConstants.WIDTH, FieldConstants.C);
 
             carpet3 = new Box(content.Load<Texture2D>("carpet3D"), FieldConstants.WIDTH, 0.01f / FieldConstants.C, FieldConstants.HEIGHT,
@@ -44,7 +46,14 @@ namespace Simulator.Animation3D
             trussVertical = new Box(content.Load<Texture2D>("trussVertical"), FieldConstants.TRUSS_SQUARE_EDGE, FieldConstants.TRUSS_HEIGHT_ABOVE_CARPET, FieldConstants.TRUSS_SQUARE_EDGE,
               new Vector3(-0.25f * FieldConstants.WIDTH, 0, FieldConstants.HEIGHT / 2 - 0.5f), FieldConstants.C);
 
+
+            walls = new List<Wall>();
+            walls.Add(new Wall(Axis.X, Direction.NegativeDirection, 0));
+            walls.Add(new Wall(Axis.X, Direction.PositiveDirection, FieldConstants.WIDTH_IN_METERS));
+            walls.Add(new Wall(Axis.Z, Direction.NegativeDirection, 0));
+            walls.Add(new Wall(Axis.Z, Direction.PositiveDirection, FieldConstants.HEIGHT_IN_METERS));
         }
+
 
         public void Draw(GraphicsDevice graphicsDevice, BasicEffect effect)
         {
@@ -73,6 +82,14 @@ namespace Simulator.Animation3D
             effect.World = Matrix.CreateTranslation(Vector3.UnitX * (FieldConstants.WIDTH * 1.5f - FieldConstants.TRUSS_SQUARE_EDGE) * FieldConstants.C) * effect.World;
             trussVertical.Draw(graphicsDevice, effect);
             effect.World = oldWorld;
+        }
+
+        public static void UpdateWallRobotInteraction(float dt, Robot r)
+        {
+            foreach (Wall wall in walls)
+            {
+                wall.Interact(dt, r);
+            }
         }
 
     }

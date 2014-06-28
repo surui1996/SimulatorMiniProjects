@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Simulator.Animation3D;
+using Microsoft.Xna.Framework.Input;
 
 namespace Simulator.PhysicalModeling
 {
@@ -24,11 +25,10 @@ namespace Simulator.PhysicalModeling
 
         public float AngularVelocity { get; set; }
 
-        //in map-pixels coordinate system
-        private Vector2 cornerFrontLeft;
-        private Vector2 cornerFrontRight;
-        private Vector2 cornerRearLeft;
-        private Vector2 cornerRearRight;
+        private Vector3 cornerFrontLeft;
+        private Vector3 cornerFrontRight;
+        private Vector3 cornerRearLeft;
+        private Vector3 cornerRearRight;
 
         private float mapHeight;
 
@@ -89,25 +89,28 @@ namespace Simulator.PhysicalModeling
 
             Velocity = Vector3.Transform(Vector3.UnitZ * velocity, Matrix.CreateRotationY(Orientation));
             AngularVelocity = angularVelocity;
-            
-            Position += Velocity * dt;
-            Orientation += angularVelocity * dt;
 
             //in map-pixels coordinate system
-            Vector3 mapVector = Position * mapMetersToPixel;
-            Vector2 pos = new Vector2(mapVector.Z, mapHeight - mapVector.X);            
-            cornerFrontLeft = pos + Vector2.Transform(new Vector2(CHASSIS_LENGTH / 2, -CHASSIS_WIDTH / 2) * mapMetersToPixel,
-                Matrix.CreateRotationZ(-Orientation));
-            cornerRearLeft = pos + Vector2.Transform(new Vector2(-CHASSIS_LENGTH / 2, -CHASSIS_WIDTH / 2) * mapMetersToPixel,
-                Matrix.CreateRotationZ(-Orientation));
-            cornerFrontRight = pos + Vector2.Transform(new Vector2(CHASSIS_LENGTH / 2, CHASSIS_WIDTH / 2) * mapMetersToPixel,
-                Matrix.CreateRotationZ(-Orientation));
-            cornerRearRight = pos + Vector2.Transform(new Vector2(-CHASSIS_LENGTH / 2, CHASSIS_WIDTH / 2) * mapMetersToPixel,
-                Matrix.CreateRotationZ(-Orientation));
+            //Vector3 mapVector = Position * mapMetersToPixel;
+            //Vector2 pos = new Vector2(mapVector.Z, mapHeight - mapVector.X);            
+            cornerFrontLeft = Position + Vector3.Transform(new Vector3(CHASSIS_WIDTH / 2, 0, CHASSIS_LENGTH / 2),
+                Matrix.CreateRotationY(Orientation));
+            cornerRearLeft = Position + Vector3.Transform(new Vector3(CHASSIS_WIDTH / 2, 0, -CHASSIS_LENGTH / 2),
+                Matrix.CreateRotationY(Orientation));
+            cornerFrontRight = Position + Vector3.Transform(new Vector3(-CHASSIS_WIDTH / 2, 0, CHASSIS_LENGTH / 2),
+                Matrix.CreateRotationY(Orientation));
+            cornerRearRight = Position + Vector3.Transform(new Vector3(-CHASSIS_WIDTH / 2, 0, -CHASSIS_LENGTH / 2),
+                Matrix.CreateRotationY(Orientation));
 
             GyroAngle += MathHelper.ToDegrees(angularVelocity * dt);
             EncoderLeft += vL * dt;
             EncoderRight += vR * dt;
+
+            for (float t = 0; t < dt; t += 0.001f)
+                Field.UpdateWallRobotInteraction(0.001f, this);
+
+            Position += Velocity * dt;
+            Orientation += AngularVelocity * dt;
 
             //CheckIntersectionWithField();
         }
@@ -151,6 +154,16 @@ namespace Simulator.PhysicalModeling
 
             return new BoundingSphere(centerPosition + Vector3.UnitY * WHEEL_RADIUS * FieldConstants.PIXELS_IN_ONE_METER,
                 CHASSIS_LENGTH * FieldConstants.PIXELS_IN_ONE_METER / 2f);
+        }
+
+        public List<Vector3> GetCorners()
+        {
+            List<Vector3> l = new List<Vector3>();
+            l.Add(cornerFrontLeft);
+            l.Add(cornerFrontRight);
+            l.Add(cornerRearLeft);
+            l.Add(cornerRearRight);
+            return l;
         }
 
         public override void Reset()
@@ -231,6 +244,31 @@ namespace Simulator.PhysicalModeling
             SetOutputs(Limit(left), Limit(right));
         }
 
+        public void KeyboardDrive(KeyboardState state)
+        {
+            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y != 0
+                || GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y != 0)
+                return;
+
+            float move = 0, rotate = 0;
+
+            if (state.IsKeyDown(Keys.Left))
+                rotate = -1;
+            else if (state.IsKeyDown(Keys.Right))
+                rotate = 1;
+            else
+                rotate = 0;
+
+            if (state.IsKeyDown(Keys.Up))
+                move = 1;
+            else if (state.IsKeyDown(Keys.Down))
+                move = -1;
+            else
+                move = 0;
+
+            ArcadeDrive(move, rotate);
+        }
+
         private void SetOutputs(float left, float right)
         {
             LeftOutput = left;
@@ -244,12 +282,6 @@ namespace Simulator.PhysicalModeling
             spriteBatch.Draw(textureOnMap, new Vector2(mapVector.Z, spriteBatch.GraphicsDevice.Viewport.Height - mapVector.X),
                 null, Color.White, -this.Orientation, new Vector2(50, 25), (mapMetersToPixel) / 100,
                 SpriteEffects.None, 0);
-            spriteBatch.Draw(textureOnMap, cornerFrontLeft,
-               null, Color.White, 0, new Vector2(50, 25), (mapMetersToPixel) / 200,
-               SpriteEffects.None, 0);
-            spriteBatch.Draw(textureOnMap, cornerRearRight,
-               null, Color.White, 0, new Vector2(50, 25), (mapMetersToPixel) / 200,
-               SpriteEffects.None, 0);
         }
 
         public override void Draw(GraphicsDevice device, BasicEffect effect, BasicEffect lighting)

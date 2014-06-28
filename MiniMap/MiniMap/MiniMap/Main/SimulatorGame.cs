@@ -378,9 +378,12 @@ namespace Simulator.Main
             if (ball.IsScored)
             {
                 score.ChangeText(int.Parse(score.Text) + 10);
-                ball.Restore();
+                ball.Restore(robot.Position);
             }
-            //robot.TankDrive(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y, GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y);
+
+            if (server.RobotState == RobotState.Teleop && server.KeyboardDrive)
+                robot.KeyboardDrive(state);
+
             robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             for (float t = 0; t < (float)gameTime.ElapsedGameTime.TotalSeconds; t += 0.001f)
                 ball.Update(0.001f, robot.GetBoundingSphere(), robot.Velocity, robot.AngularVelocity);
@@ -411,6 +414,8 @@ namespace Simulator.Main
             score.Text = "0";
             robot.Reset();
             ball.Reset();
+            if (match)
+                ball.PutOnRobot();
             communicationList.Reset();
         }
 

@@ -25,8 +25,8 @@ namespace Simulator.Main
             Content.RootDirectory = "Content";
 
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = (int)(GameConstants.RESOLUTION_X / 1.5f);
-            graphics.PreferredBackBufferHeight = (int)(GameConstants.RESOLUTION_Y / 1.5f);
+            graphics.PreferredBackBufferWidth = (int)(GameConstants.RESOLUTION_X);
+            graphics.PreferredBackBufferHeight = (int)(GameConstants.RESOLUTION_Y);
 
             // Create the screen manager component.
             screenManager = new ScreenManager(this);
@@ -34,7 +34,7 @@ namespace Simulator.Main
             Components.Add(screenManager);
 
             // Activate the first screens.
-            screenManager.AddScreen(new MainMenu(false));
+            screenManager.AddScreen(new MainMenu(true));
         }
 
 

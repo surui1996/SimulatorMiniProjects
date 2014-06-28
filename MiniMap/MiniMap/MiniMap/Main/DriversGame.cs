@@ -159,33 +159,6 @@ namespace Simulator.Main
         }
 
 
-        float move = 0, rotate = 0;
-        const float increment = 0.05f;
-        void UpdateRobotPosition()
-        {
-            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y != 0
-                || GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y != 0)
-                return;
-
-            KeyboardState keyboardState = Keyboard.GetState();
-
-            if (keyboardState.IsKeyDown(Keys.Left))
-                rotate = -1;
-            else if (keyboardState.IsKeyDown(Keys.Right))
-                rotate = 1;
-            else
-                rotate = 0;
-
-            if (keyboardState.IsKeyDown(Keys.Up))
-                move = 1;
-            else if (keyboardState.IsKeyDown(Keys.Down))
-                move = -1;
-            else
-                move = 0;
-
-            robot.ArcadeDrive(move, rotate);
-        }
-
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -264,7 +237,7 @@ namespace Simulator.Main
                 ball.Restore(robot.Position);
             }
             robot.TankDrive(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y, GamePad.GetState(PlayerIndex.One).ThumbSticks.Right.Y);
-            UpdateRobotPosition();
+            robot.KeyboardDrive(state);
 
             robot.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             for (float t = 0; t < (float)gameTime.ElapsedGameTime.TotalSeconds; t += 0.001f)
